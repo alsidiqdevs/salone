@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CivicLink Sierra Leone — National Citizen Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#0D1117; --ink2:#1C2434; --ink3:#2D3748;
+  --surface:#F0F4F1; --card:#FFFFFF; --border:#E2E8F0; --muted:#6B7A8D;
+  --green:#1A6B3C; --green2:#23924F; --green3:#10B981; --green-tint:#E8F5EE;
+  --gold:#C8780A; --gold2:#F59E0B; --gold-tint:#FEF3DC;
+  --red:#B91C1C; --red-tint:#FEE2E2;
+  --blue:#1A4FA8; --blue2:#3B82F6; --blue-tint:#EBF2FC;
+  --orange:#C2410C; --orange-tint:#FFEDD5;
+  --purple:#5B21B6; --purple2:#7C3AED; --purple-tint:#EDE9FE;
+  --wangov:#0A3D7C; --wangov-light:#1A5CA8; --wangov-tint:#E8F0FB;
+  --r:10px; --r2:16px; --r3:20px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.07);
+  --sh2:0 4px 20px rgba(0,0,0,.10),0 16px 48px rgba(0,0,0,.12);
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:#000;color:var(--ink);overflow:hidden;}
+.app{display:flex;flex-direction:column;height:100vh;width:100%;max-width:480px;margin:0 auto;background:var(--surface);position:relative;overflow:hidden;box-shadow:0 0 80px rgba(0,0,0,.4);}
+
+/* ━━━ ONBOARDING ━━━ */
+.onboard{position:absolute;inset:0;z-index:1000;display:flex;flex-direction:column;background:var(--ink2);transition:opacity .4s,transform .4s;}
+.onboard.hidden{opacity:0;pointer-events:none;transform:translateY(-20px);}
+.ob-slides{flex:1;overflow:hidden;position:relative;}
+.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;}
+.ob-slide.active{opacity:1;pointer-events:all;}
+.ob-emoji{font-size:64px;margin-bottom:20px;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.ob-h{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;color:#FFF;line-height:1.2;margin-bottom:12px;}
+.ob-h em{color:var(--gold2);font-style:normal;}
+.ob-p{font-size:14px;color:rgba(255,255,255,.65);line-height:1.65;max-width:320px;}
+.ob-flag-strip{display:flex;gap:0;border-radius:8px;overflow:hidden;width:80px;height:10px;margin:20px auto 0;}
+.obf-g{background:#1EB53A;flex:1;} .obf-w{background:#FFF;flex:1;} .obf-b{background:#0072C6;flex:1;}
+.ob-bottom{padding:20px 28px 32px;display:flex;flex-direction:column;gap:12px;flex-shrink:0;}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin-bottom:4px;}
+.ob-dot{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.2);transition:all .3s;}
+.ob-dot.active{background:var(--gold2);width:24px;}
+.ob-next{width:100%;background:var(--green);color:#FFF;border:none;border-radius:14px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;}
+.ob-next:hover{background:var(--green2);}
+.ob-skip{background:none;border:none;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;text-align:center;padding:4px;}
+
+/* ━━━ LANG SELECT ━━━ */
+.lang-overlay{position:absolute;inset:0;z-index:900;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
+.lang-overlay.show{opacity:1;pointer-events:all;}
+.lang-sheet{background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;}
+.lang-sheet-h{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:18px;}
+.lang-opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--r2);border:2px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .2s;}
+.lang-opt.sel{border-color:var(--green);background:var(--green-tint);}
+.lang-opt-flag{font-size:28px;}
+.lang-opt-name{font-size:16px;font-weight:700;color:var(--ink);}
+.lang-opt-sub{font-size:12px;color:var(--muted);}
+.lang-opt-check{margin-left:auto;font-size:20px;opacity:0;}
+.lang-opt.sel .lang-opt-check{opacity:1;color:var(--green);}
+
+/* ━━━ HEADER ━━━ */
+.header{background:var(--ink2);flex-shrink:0;}
+.header-top{display:flex;align-items:center;gap:10px;padding:11px 14px 10px;}
+.flag-sm{display:flex;flex-direction:column;width:22px;height:15px;border-radius:2px;overflow:hidden;flex-shrink:0;}
+.fg{background:#1EB53A;flex:1;}.fw{background:#FFF;flex:1;}.fb{background:#0072C6;flex:1;}
+.brand{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:800;color:#FFF;letter-spacing:-.3px;}
+.brand span{color:var(--gold2);}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.hbtn{background:rgba(255,255,255,.08);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;position:relative;transition:background .15s;color:#FFF;}
+.hbtn:hover{background:rgba(255,255,255,.15);}
+.hbtn .bdot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--gold2);border-radius:50%;border:1.5px solid var(--ink2);}
+.av{width:32px;height:32px;border-radius:50%;background:var(--gold2);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;}
+.mode-tabs{display:flex;padding:0 14px;gap:0;border-top:1px solid rgba(255,255,255,.07);}
+.mtab{flex:1;padding:9px 4px;font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-align:center;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;white-space:nowrap;}
+.mtab.active{color:#FFF;border-bottom-color:var(--gold2);}
+
+/* ━━━ LIVE BAR ━━━ */
+.live-bar{background:var(--green);padding:6px 14px;display:flex;align-items:center;gap:7px;font-size:11px;color:#FFF;flex-shrink:0;}
+.pip{width:6px;height:6px;border-radius:50%;background:#FFF;animation:pip 1.4s infinite;flex-shrink:0;}
+@keyframes pip{0%,100%{opacity:1;}50%{opacity:.3;}}
+.lb-text{flex:1;font-weight:500;}
+.lb-text b{font-weight:700;}
+.lb-wangov{background:rgba(255,255,255,.18);border-radius:8px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+/* ━━━ OFFLINE BANNER ━━━ */
+.offline-banner{background:var(--orange);padding:6px 14px;font-size:11px;color:#FFF;font-weight:700;text-align:center;display:none;flex-shrink:0;}
+.offline-banner.show{display:block;}
+
+/* ━━━ USSD BAR ━━━ */
+.ussd-bar{background:var(--gold-tint);border-top:1px solid #F6D860;padding:5px 14px;font-size:10px;color:var(--gold);font-weight:700;display:flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;}
+.ussd-bar:hover{background:#FEF0C7;}
+
+/* ━━━ CONTENT ━━━ */
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ━━━ SHARED COMPONENTS ━━━ */
+.sec-h{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.sec-h .dot{width:5px;height:5px;border-radius:50%;background:var(--green);}
+.card{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);padding:14px;margin-bottom:10px;}
+.pad{padding:14px 14px 80px;}
+.pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0;}
+.pill-red{background:var(--red-tint);color:var(--red);}
+.pill-gold{background:var(--gold-tint);color:var(--gold);}
+.pill-green{background:var(--green-tint);color:var(--green);}
+.pill-blue{background:var(--blue-tint);color:var(--blue);}
+.pill-purple{background:var(--purple-tint);color:var(--purple);}
+.pill-orange{background:var(--orange-tint);color:var(--orange);}
+.fi,.fs,.ft{width:100%;border:1.5px solid var(--border);border-radius:var(--r);padding:10px 13px;font-size:13px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--card);outline:none;transition:border-color .15s;margin-bottom:10px;}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--green);}
+.ft{resize:none;height:80px;}
+.fl label{display:block;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink);margin-bottom:5px;}
+.btn-green{width:100%;background:var(--green);color:#FFF;border:none;border-radius:12px;padding:14px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-green:hover{background:var(--green2);}
+.btn-green:active{transform:scale(.98);}
+.btn-green:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#FFF;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;flex-shrink:0;}
+
+/* ━━━ DISTRICT SELECTOR ━━━ */
+.district-overlay{position:absolute;inset:0;z-index:800;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
+.district-overlay.show{opacity:1;pointer-events:all;}
+.district-sheet{background:var(--card);border-radius:24px 24px 0 0;padding:20px 16px 32px;width:100%;max-height:80vh;overflow-y:auto;}
+.ds-h{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px;text-align:center;}
+.district-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.dist-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 10px;cursor:pointer;transition:all .2s;text-align:left;}
+.dist-btn:hover,.dist-btn.sel{border-color:var(--green);background:var(--green-tint);}
+.dist-name{font-size:13px;font-weight:700;color:var(--ink);}
+.dist-region{font-size:10px;color:var(--muted);margin-top:2px;}
+.dist-count{font-size:10px;color:var(--green);font-weight:700;margin-top:4px;font-family:'JetBrains Mono',monospace;}
+
+/* ━━━ HOME SCREEN ━━━ */
+.hero{background:linear-gradient(160deg,var(--ink2) 0%,#0F3A22 100%);padding:18px 14px 20px;}
+.hero-kicker{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold2);margin-bottom:5px;}
+.hero-h{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:#FFF;line-height:1.25;margin-bottom:12px;}
+.hero-h em{color:var(--gold2);font-style:normal;}
+.hero-loc{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;cursor:pointer;transition:background .15s;}
+.hero-loc:hover{background:rgba(255,255,255,.13);}
+.hero-loc-text{font-size:12px;color:rgba(255,255,255,.75);flex:1;}
+.hero-loc-text b{color:#FFF;font-weight:700;}
+.hero-loc-change{font-size:10px;color:var(--gold2);font-weight:700;}
+.pulse-row{display:flex;align-items:center;gap:7px;margin-top:11px;background:rgba(255,255,255,.06);border-radius:8px;padding:7px 11px;font-size:11px;color:rgba(255,255,255,.75);}
+.pulse-row b{color:var(--gold2);}
+
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px 0;}
+.met{background:var(--card);border-radius:var(--r);padding:11px 8px;text-align:center;box-shadow:var(--sh);}
+.met-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;line-height:1;}
+.met-lbl{font-size:9px;color:var(--muted);font-weight:600;margin-top:2px;}
+.met.red .met-num{color:var(--red);}
+.met.gold .met-num{color:var(--gold);}
+.met.green .met-num{color:var(--green);}
+
+.sec-row{padding:14px 14px 8px;display:flex;align-items:center;justify-content:space-between;}
+.sec-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--ink);}
+.sec-link{font-size:12px;color:var(--green);font-weight:700;cursor:pointer;}
+
+.cat-scroll{display:flex;gap:10px;padding:0 14px 6px;overflow-x:auto;scrollbar-width:none;}
+.cat-scroll::-webkit-scrollbar{display:none;}
+.cat-chip{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;cursor:pointer;}
+.cc-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .15s;}
+.cat-chip:active .cc-icon{transform:scale(.92);}
+.cc-lbl{font-size:10px;font-weight:600;color:var(--ink);text-align:center;width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.rstack{padding:0 14px;display:flex;flex-direction:column;gap:8px;}
+.rcard{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;cursor:pointer;transition:transform .15s;}
+.rcard:active{transform:scale(.98);}
+.rcard-bar{height:3px;}
+.rcard-body{padding:11px 13px;}
+.rcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px;}
+.rcard-cat{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.rcard-title{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35;}
+.rcard-meta{display:flex;gap:10px;font-size:10px;color:var(--muted);}
+.rcard-dept{margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.ai-badge{display:inline-flex;align-items:center;gap:3px;background:var(--purple-tint);color:var(--purple);font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;margin-top:3px;}
+
+/* ━━━ WANGOV PANEL ━━━ */
+.wangov-card{background:linear-gradient(135deg,var(--wangov),var(--wangov-light));border-radius:var(--r2);padding:14px;margin:0 14px 10px;box-shadow:var(--sh2);cursor:pointer;transition:transform .15s;}
+.wangov-card:active{transform:scale(.98);}
+.wg-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.wg-logo{width:36px;height:36px;background:#FFF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.wg-title{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#FFF;}
+.wg-sub{font-size:10px;color:rgba(255,255,255,.65);}
+.wg-badge{margin-left:auto;background:rgba(255,255,255,.15);border-radius:8px;padding:3px 8px;font-size:10px;color:#FFF;font-weight:700;}
+.wg-services{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.wg-svc{background:rgba(255,255,255,.10);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:background .15s;}
+.wg-svc:hover{background:rgba(255,255,255,.18);}
+.wg-svc-icon{font-size:18px;margin-bottom:3px;}
+.wg-svc-lbl{font-size:9px;color:rgba(255,255,255,.8);font-weight:600;}
+
+/* ━━━ REPORT SCREEN ━━━ */
+.rform{padding:14px 14px 80px;}
+.rform-h{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:var(--green);margin-bottom:2px;}
+.rform-sub{font-size:12px;color:var(--muted);margin-bottom:16px;}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+.cbtn{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:9px 10px;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink);transition:all .15s;}
+.cbtn .ci{font-size:17px;}
+.cbtn.sel{border-color:var(--green);background:var(--green-tint);color:var(--green);}
+.sev-row{display:flex;gap:6px;margin-bottom:12px;}
+.sbtn{flex:1;border:1.5px solid var(--border);border-radius:var(--r);padding:8px 4px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;background:var(--card);transition:all .15s;}
+.sbtn.low.s{background:var(--green-tint);border-color:var(--green);color:var(--green);}
+.sbtn.med.s{background:var(--gold-tint);border-color:var(--gold);color:var(--gold);}
+.sbtn.high.s{background:var(--orange-tint);border-color:var(--orange);color:var(--orange);}
+.sbtn.crit.s{background:var(--red-tint);border-color:var(--red);color:var(--red);}
+.route-box{background:var(--blue-tint);border:1.5px solid #BEE3F8;border-radius:var(--r);padding:11px 13px;margin-bottom:12px;}
+.route-lbl{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--blue);margin-bottom:7px;}
+.route-item{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:11px;color:var(--ink);border-bottom:1px solid rgba(0,0,0,.05);}
+.route-item:last-child{border:none;}
+.ri-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--r);padding:18px;text-align:center;color:var(--muted);cursor:pointer;background:var(--card);font-size:12px;transition:border-color .15s;margin-bottom:12px;}
+.upload-zone:hover{border-color:var(--green);}
+.uz-icon{font-size:26px;margin-bottom:5px;}
+.anon-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:11px 13px;margin-bottom:12px;}
+.toggle{width:40px;height:22px;background:var(--border);border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--green);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#FFF;border-radius:50%;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{left:21px;}
+
+/* ━━━ TRACKER ━━━ */
+.tcard{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);margin-bottom:10px;overflow:hidden;}
+.tc-head{padding:12px 13px 0;display:flex;justify-content:space-between;align-items:flex-start;}
+.tc-title{font-size:14px;font-weight:700;color:var(--ink);}
+.tc-id{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.pbar{display:flex;align-items:center;padding:12px 13px 0;}
+.pstep{flex:1;text-align:center;position:relative;}
+.pstep::before{content:'';position:absolute;top:9px;left:-50%;right:50%;height:2px;background:var(--border);z-index:0;}
+.pstep:first-child::before{display:none;}
+.pstep.done::before,.pstep.now::before{background:var(--green);}
+.pdot{width:18px;height:18px;border-radius:50%;background:var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--muted);position:relative;z-index:1;}
+.pstep.done .pdot{background:var(--green);color:#FFF;}
+.pstep.now .pdot{background:var(--gold);color:#FFF;box-shadow:0 0 0 3px var(--gold-tint);}
+.plbl{font-size:8px;color:var(--muted);margin-top:3px;font-weight:600;}
+.pstep.done .plbl{color:var(--green);}
+.pstep.now .plbl{color:var(--gold);}
+.tc-resp{margin:10px 13px 12px;background:var(--surface);border-radius:8px;padding:9px 11px;display:flex;gap:7px;font-size:11px;}
+.tcr-dept{font-size:10px;font-weight:700;color:var(--green);margin-bottom:2px;}
+.tc-rate{padding:0 13px 12px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);}
+.star{font-size:15px;cursor:pointer;}
+
+/* ━━━ FEED / MAP ━━━ */
+.ftabs{display:flex;gap:5px;padding:10px 14px 8px;overflow-x:auto;scrollbar-width:none;}
+.ftabs::-webkit-scrollbar{display:none;}
+.ftab{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.ftab.active{background:var(--green);color:#FFF;border-color:var(--green);}
+.map-box{background:linear-gradient(145deg,#e8f0e8,#c8dfc8);border-radius:var(--r2);height:170px;position:relative;margin:0 14px 10px;border:1.5px solid var(--border);overflow:hidden;}
+.map-grid{position:absolute;inset:0;opacity:.12;background-image:linear-gradient(var(--green) 1px,transparent 1px),linear-gradient(90deg,var(--green) 1px,transparent 1px);background-size:28px 28px;}
+.map-rh{position:absolute;top:50%;left:0;right:0;height:3px;background:rgba(255,255,255,.65);transform:translateY(-50%);}
+.map-rv{position:absolute;left:33%;top:0;bottom:0;width:3px;background:rgba(255,255,255,.65);}
+.map-rv2{position:absolute;left:68%;top:0;bottom:0;width:2px;background:rgba(255,255,255,.45);}
+.map-lbl{position:absolute;top:7px;left:8px;font-size:9px;font-weight:700;color:var(--green);background:rgba(255,255,255,.85);padding:2px 7px;border-radius:6px;}
+.mpin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;}
+.mpin-dot{width:16px;height:16px;border-radius:50%;border:2px solid #FFF;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+.map-legend{position:absolute;bottom:6px;right:6px;display:flex;flex-direction:column;gap:2px;}
+.mleg{display:flex;align-items:center;gap:3px;font-size:8px;background:rgba(255,255,255,.85);padding:2px 5px;border-radius:4px;}
+.mleg-dot{width:7px;height:7px;border-radius:50%;}
+
+/* ━━━ ALERTS ━━━ */
+.alert-card{border-radius:var(--r2);padding:13px;margin-bottom:9px;border-left:4px solid;}
+.alert-card.emr{background:var(--red-tint);border-color:var(--red);}
+.alert-card.warn{background:var(--gold-tint);border-color:var(--gold);}
+.alert-card.info{background:var(--blue-tint);border-color:var(--blue);}
+.alert-card.ok{background:var(--green-tint);border-color:var(--green);}
+.alert-type{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;}
+.emr .alert-type{color:var(--red);}.warn .alert-type{color:var(--gold);}.info .alert-type{color:var(--blue);}.ok .alert-type{color:var(--green);}
+.alert-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.alert-body{font-size:11px;color:var(--ink);line-height:1.5;margin-bottom:7px;}
+.alert-meta{font-size:10px;color:var(--muted);}
+.alert-act{display:inline-block;margin-top:7px;font-size:11px;font-weight:700;padding:5px 12px;border-radius:7px;cursor:pointer;border:none;}
+.emr .alert-act{background:var(--red);color:#FFF;}.warn .alert-act{background:var(--gold);color:#FFF;}.info .alert-act{background:var(--blue);color:#FFF;}
+
+/* ━━━ WANGOV SCREEN ━━━ */
+.wg-hero{background:linear-gradient(135deg,var(--wangov),#1E6FB5);padding:20px 14px;margin-bottom:0;}
+.wg-hero-h{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:#FFF;margin-bottom:4px;}
+.wg-hero-sub{font-size:12px;color:rgba(255,255,255,.65);margin-bottom:14px;}
+.wg-search{width:100%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 13px;font-size:13px;font-family:'Inter',sans-serif;color:#FFF;outline:none;}
+.wg-search::placeholder{color:rgba(255,255,255,.45);}
+.wg-cats{padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
+.wg-cat-card{background:var(--card);border-radius:var(--r2);padding:13px;box-shadow:var(--sh);cursor:pointer;transition:all .15s;border:1.5px solid transparent;}
+.wg-cat-card:hover{border-color:var(--wangov);transform:translateY(-1px);}
+.wg-cat-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.wg-cat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--wangov-tint);flex-shrink:0;}
+.wg-cat-name{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--ink);}
+.wg-cat-sub{font-size:11px;color:var(--muted);}
+.wg-svc-list{display:flex;flex-wrap:wrap;gap:5px;}
+.wg-svc-pill{background:var(--wangov-tint);color:var(--wangov);font-size:10px;font-weight:600;padding:3px 9px;border-radius:10px;}
+.wg-link-btn{background:var(--wangov);color:#FFF;border:none;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer;width:100%;margin-top:10px;transition:background .15s;}
+.wg-link-btn:hover{background:var(--wangov-light);}
+.wg-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);font-weight:700;margin-top:6px;}
+.wg-status-dot{width:7px;height:7px;border-radius:50%;background:var(--green3);animation:pip 1.4s infinite;}
+
+/* ━━━ GOV PORTAL ━━━ */
+.gov-login{padding:24px 14px 80px;display:flex;flex-direction:column;align-items:center;}
+.gov-login-hero{background:linear-gradient(135deg,var(--ink2),#0F2A50);border-radius:var(--r2);padding:24px 20px;width:100%;text-align:center;margin-bottom:16px;}
+.gov-crest{font-size:40px;margin-bottom:8px;}
+.gov-login-h{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:800;color:#FFF;margin-bottom:4px;}
+.gov-login-sub{font-size:11px;color:rgba(255,255,255,.55);}
+.min-select{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:14px;}
+.min-btn{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:11px 10px;cursor:pointer;text-align:left;transition:all .15s;}
+.min-btn:hover,.min-btn.sel{border-color:var(--blue);background:var(--blue-tint);}
+.min-icon{font-size:22px;margin-bottom:4px;}
+.min-name{font-size:11px;font-weight:700;color:var(--ink);line-height:1.3;}
+.gov-pass{width:100%;margin-bottom:10px;}
+.gov-enter{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#FFF;border:none;border-radius:12px;padding:14px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;transition:all .2s;}
+.gov-enter:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(26,79,168,.35);}
+
+/* Gov Dashboard */
+.gov-dash{padding:14px 14px 80px;}
+.gov-hero-strip{background:linear-gradient(135deg,var(--ink2),#0F2A50);border-radius:var(--r2);padding:16px;margin-bottom:12px;}
+.gov-hero-h{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#FFF;margin-bottom:10px;}
+.gov-stats-g{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.gs{background:rgba(255,255,255,.08);border-radius:8px;padding:9px 11px;}
+.gs-num{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#FFF;line-height:1;}
+.gs-lbl{font-size:9px;color:rgba(255,255,255,.45);margin-top:1px;}
+.gs.r .gs-num{color:#F87171;} .gs.g .gs-num{color:#6EE7B7;} .gs.y .gs-num{color:#FDE68A;}
+.iq-card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:11px 13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;border-left:3px solid var(--border);margin-bottom:7px;transition:all .15s;}
+.iq-card.c{border-left-color:var(--red);}
+.iq-card.h{border-left-color:var(--orange);}
+.iq-card.m{border-left-color:var(--gold);}
+.iq-score{background:var(--surface);border-radius:7px;padding:5px 7px;text-align:center;flex-shrink:0;min-width:40px;}
+.iq-snum{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;line-height:1;}
+.iq-slbl{font-size:7px;color:var(--muted);font-weight:600;letter-spacing:.5px;}
+.iq-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.iq-meta{font-size:10px;color:var(--muted);}
+.assign-btn{font-size:10px;font-weight:700;background:var(--green);color:#FFF;border:none;border-radius:5px;padding:3px 9px;cursor:pointer;margin-top:5px;}
+.sc-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+.sc-row:last-child{border:none;}
+.sc-rank{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--muted);width:18px;flex-shrink:0;}
+.sc-agency{flex:1;font-size:11px;font-weight:600;color:var(--ink);}
+.sc-track{width:70px;height:5px;background:var(--border);border-radius:3px;flex-shrink:0;}
+.sc-fill{height:100%;border-radius:3px;}
+.sc-pct{font-size:10px;font-weight:700;width:30px;text-align:right;flex-shrink:0;}
+.escal-row{display:flex;align-items:center;gap:0;font-size:10px;margin:8px 0;}
+.escal-step{flex:1;text-align:center;}
+.escal-lbl{border-radius:7px;padding:5px 3px;font-weight:700;font-size:9px;line-height:1.3;}
+.escal-time{font-size:8px;color:var(--muted);margin-top:2px;}
+.escal-arr{color:var(--muted);padding:0 2px;font-size:11px;}
+
+/* ━━━ TRANSPARENCY DASHBOARD ━━━ */
+.trans-hero{background:linear-gradient(135deg,#0F2A0F,var(--green));padding:18px 14px;margin-bottom:0;}
+.trans-h{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:#FFF;margin-bottom:3px;}
+.trans-sub{font-size:11px;color:rgba(255,255,255,.6);}
+.open-data-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border-radius:8px;padding:4px 10px;font-size:10px;font-weight:700;color:#FFF;margin-top:10px;}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px 0;}
+.kpi{background:var(--card);border-radius:var(--r2);padding:13px;box-shadow:var(--sh);}
+.kpi-num{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;line-height:1;color:var(--green);}
+.kpi-lbl{font-size:10px;color:var(--muted);font-weight:600;margin-top:3px;}
+.kpi-trend{font-size:10px;font-weight:700;margin-top:4px;}
+.kpi-trend.up{color:var(--green3);}
+.kpi-trend.down{color:var(--red);}
+.kpi.warn .kpi-num{color:var(--gold);}
+.kpi.bad .kpi-num{color:var(--red);}
+.bar-chart-h{display:flex;align-items:flex-end;gap:5px;height:70px;padding:0 4px;}
+.bc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bc-bar{width:100%;border-radius:4px 4px 0 0;transition:height .6s;}
+.bc-val{font-size:8px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.bc-lbl{font-size:8px;color:var(--muted);font-weight:600;}
+
+/* ━━━ USSD SIMULATOR ━━━ */
+.ussd-phone{background:#111;border-radius:24px;padding:16px;margin:0 14px;box-shadow:var(--sh2);}
+.ussd-screen{background:#1a2a1a;border-radius:14px;padding:14px;min-height:200px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#5CDB5C;line-height:1.7;margin-bottom:12px;position:relative;}
+.ussd-cursor{animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.ussd-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ussd-key{background:rgba(255,255,255,.06);border:none;border-radius:10px;padding:12px 6px;color:#FFF;font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:background .15s;}
+.ussd-key:hover{background:rgba(255,255,255,.12);}
+.ussd-key.action{background:var(--green);font-size:11px;font-weight:700;}
+.ussd-key.del{background:rgba(255,80,80,.2);color:#F87171;}
+.sms-demo{background:var(--card);border-radius:var(--r2);padding:14px;margin:10px 14px 0;box-shadow:var(--sh);}
+.sms-h{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px;}
+.sms-bubble{background:var(--green);color:#FFF;border-radius:14px 14px 4px 14px;padding:9px 12px;font-size:12px;line-height:1.5;max-width:85%;margin-bottom:8px;}
+.sms-bubble.in{background:var(--surface);color:var(--ink);border-radius:14px 14px 14px 4px;margin-left:auto;}
+
+/* ━━━ OFFLINE SCREEN ━━━ */
+.offline-screen{padding:14px 14px 80px;}
+.offline-hero{background:linear-gradient(135deg,#3D2B00,#7A5500);border-radius:var(--r2);padding:20px;text-align:center;margin-bottom:14px;}
+.offline-icon{font-size:48px;margin-bottom:10px;}
+.offline-h{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#FFF;margin-bottom:4px;}
+.offline-sub{font-size:12px;color:rgba(255,255,255,.6);}
+.offline-queue{background:var(--card);border-radius:var(--r2);padding:13px;box-shadow:var(--sh);margin-bottom:10px;}
+.oq-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.oq-item:last-child{border:none;}
+.oq-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--gold-tint);flex-shrink:0;}
+.oq-title{font-size:12px;font-weight:600;color:var(--ink);flex:1;}
+.oq-status{font-size:10px;font-weight:700;color:var(--gold);}
+.sync-btn{background:var(--gold);color:#FFF;border:none;border-radius:10px;padding:11px;font-weight:700;font-size:13px;cursor:pointer;width:100%;margin-top:8px;font-family:'Space Grotesk',sans-serif;}
+
+/* ━━━ AI ENGINE ━━━ */
+.ai-screen{padding:14px 14px 80px;}
+.ai-box{background:linear-gradient(135deg,#1E0A3C,#2D1264);border-radius:var(--r2);padding:14px;margin-bottom:10px;position:relative;overflow:hidden;}
+.ai-box::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(139,92,246,.15);border-radius:50%;}
+.ai-box-lbl{font-size:9px;font-weight:700;letter-spacing:1px;color:#A78BFA;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.ai-content{font-size:12px;color:rgba(255,255,255,.85);line-height:1.6;min-height:36px;}
+.ai-content.loading{color:rgba(255,255,255,.4);font-style:italic;}
+.ai-meta{margin-top:8px;display:flex;align-items:center;justify-content:space-between;}
+.ai-conf{font-size:10px;color:#A78BFA;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.ai-act{background:rgba(139,92,246,.3);border:1px solid rgba(139,92,246,.5);color:#C4B5FD;font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;cursor:pointer;}
+.ai-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;}
+.ai-tabs::-webkit-scrollbar{display:none;}
+.aitab{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.aitab.active{background:var(--purple2);color:#FFF;border-color:var(--purple2);}
+.chat-hist{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;min-height:80px;}
+.cmsg{max-width:85%;padding:9px 12px;border-radius:13px;font-size:12px;line-height:1.5;}
+.cmsg.u{background:var(--green);color:#FFF;align-self:flex-end;border-bottom-right-radius:3px;}
+.cmsg.a{background:var(--card);color:var(--ink);align-self:flex-start;border-bottom-left-radius:3px;box-shadow:var(--sh);}
+.cmsg.a.loading{color:var(--muted);font-style:italic;}
+.chat-row{display:flex;gap:7px;}
+.chat-inp{flex:1;border:1.5px solid var(--border);border-radius:11px;padding:9px 12px;font-size:12px;font-family:'Inter',sans-serif;background:var(--card);outline:none;transition:border-color .15s;}
+.chat-inp:focus{border-color:var(--purple2);}
+.chat-send{background:var(--green);color:#FFF;border:none;border-radius:11px;padding:9px 14px;font-weight:700;cursor:pointer;font-size:12px;transition:background .15s;}
+.chat-send:disabled{opacity:.4;cursor:not-allowed;}
+.prompt-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.pchip{background:var(--purple-tint);color:var(--purple);font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;cursor:pointer;transition:all .15s;}
+.pchip:hover{background:var(--purple2);color:#FFF;}
+.af-grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.achip{border:1.5px solid var(--border);border-radius:8px;padding:7px 9px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;background:var(--card);transition:all .15s;text-align:center;}
+.achip.sel{border-color:var(--purple2);background:var(--purple-tint);color:var(--purple);}
+.risk-bar{margin-bottom:8px;}
+.rb-row{display:flex;justify-content:space-between;font-size:10px;font-weight:700;margin-bottom:3px;}
+.rb-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.rb-fill{height:100%;border-radius:3px;transition:width .8s;}
+
+/* ━━━ PROFILE ━━━ */
+.profile-hero{background:linear-gradient(135deg,var(--green),var(--green2));border-radius:var(--r2);padding:20px;text-align:center;margin-bottom:12px;}
+.ph-av{width:58px;height:58px;border-radius:50%;background:var(--gold2);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:var(--ink);margin:0 auto 10px;}
+.ph-name{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#FFF;}
+.ph-loc{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;}
+.ph-chips{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+.phchip{background:rgba(255,255,255,.15);border-radius:10px;padding:3px 9px;font-size:10px;font-weight:700;color:#FFF;}
+.impact-g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:12px;}
+.ic{background:var(--card);border-radius:var(--r);padding:11px 7px;text-align:center;box-shadow:var(--sh);}
+.ic-n{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--green);}
+.ic-l{font-size:9px;color:var(--muted);font-weight:600;margin-top:1px;}
+.menu-list{display:flex;flex-direction:column;gap:6px;}
+.mi{background:var(--card);border-radius:var(--r);padding:13px;display:flex;align-items:center;gap:11px;cursor:pointer;box-shadow:var(--sh);font-size:13px;font-weight:600;transition:all .15s;}
+.mi:hover{background:var(--green-tint);}
+.mi-icon{font-size:19px;width:26px;text-align:center;}
+.mi-arr{margin-left:auto;color:var(--muted);}
+.mi-badge{margin-left:auto;font-size:10px;font-weight:700;color:var(--green);background:var(--green-tint);padding:2px 7px;border-radius:7px;}
+
+/* ━━━ LANDING PAGE ━━━ */
+.landing{overflow-y:auto;height:100%;padding-bottom:0;}
+.lp-hero{background:linear-gradient(160deg,#050D14 0%,#0A2818 60%,#0F3A22 100%);padding:40px 20px 32px;text-align:center;}
+.lp-kicker{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);margin-bottom:12px;}
+.lp-h{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:#FFF;line-height:1.2;margin-bottom:12px;}
+.lp-h em{color:var(--gold2);font-style:normal;}
+.lp-sub{font-size:13px;color:rgba(255,255,255,.65);line-height:1.65;max-width:340px;margin:0 auto 20px;}
+.lp-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.lp-btn-g{background:var(--green);color:#FFF;border:none;border-radius:12px;padding:13px 22px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;}
+.lp-btn-g:hover{background:var(--green2);transform:translateY(-2px);}
+.lp-btn-o{background:transparent;color:#FFF;border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:12px 20px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;}
+.lp-btn-o:hover{border-color:rgba(255,255,255,.6);}
+.lp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.07);border-radius:var(--r2);overflow:hidden;margin:24px 20px 0;}
+.lp-stat{background:#0F1E13;padding:16px 10px;text-align:center;}
+.lp-stat-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--gold2);}
+.lp-stat-lbl{font-size:9px;color:rgba(255,255,255,.45);font-weight:600;margin-top:2px;}
+.lp-features{padding:24px 20px;}
+.lp-features-h{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:var(--ink);text-align:center;margin-bottom:16px;}
+.feat-card{background:var(--card);border-radius:var(--r2);padding:14px;box-shadow:var(--sh);margin-bottom:10px;display:flex;gap:12px;}
+.feat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.feat-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.feat-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.lp-partners{padding:0 20px 20px;}
+.lp-partners-h{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:12px;letter-spacing:.5px;}
+.partner-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.partner-pill{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:7px 13px;font-size:11px;font-weight:700;color:var(--ink);box-shadow:var(--sh);}
+.lp-cta{background:linear-gradient(135deg,var(--green),#0F3A22);padding:28px 20px;text-align:center;}
+.lp-cta-h{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:#FFF;margin-bottom:8px;}
+.lp-cta-sub{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:16px;}
+.roadmap{padding:0 20px 24px;}
+.rm-h{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:800;color:var(--ink);text-align:center;margin-bottom:14px;}
+.rm-step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;}
+.rm-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800;flex-shrink:0;}
+.rm-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.rm-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* ━━━ BOTTOM NAV ━━━ */
+.bnav{background:var(--card);border-top:1px solid var(--border);display:flex;padding:7px 0 10px;flex-shrink:0;z-index:100;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;color:var(--muted);padding:3px 0;font-size:9px;font-weight:700;transition:color .15s;}
+.nb.active{color:var(--green);}
+.nb-icon{font-size:20px;line-height:1;}
+.nb-report{background:var(--green);color:#FFF!important;border-radius:12px;margin-top:-12px;padding:10px 7px 3px;box-shadow:0 4px 14px rgba(26,107,60,.4);}
+.nb-report:hover{background:var(--green2);}
+
+/* ━━━ TOAST ━━━ */
+.toast{position:fixed;bottom:68px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#FFF;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:600;opacity:0;transition:all .3s;z-index:2000;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:7px;box-shadow:var(--sh2);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ━━━ ONBOARDING ━━━ -->
+<div class="onboard" id="onboard">
+  <div class="ob-slides">
+    <div class="ob-slide active" id="ob0">
+      <div class="ob-flag-strip"><div class="obf-g"></div><div class="obf-w"></div><div class="obf-b"></div></div>
+      <div class="ob-emoji" style="margin-top:20px;">🇸🇱</div>
+      <div class="ob-h">Welcome to<br><em>CivicLink</em></div>
+      <div class="ob-p">Sierra Leone's national platform connecting citizens directly to government — making your voice the eyes and ears of the state.</div>
+    </div>
+    <div class="ob-slide" id="ob1">
+      <div class="ob-emoji">📱</div>
+      <div class="ob-h">Report any issue<br><em>instantly</em></div>
+      <div class="ob-p">Damaged roads, power outages, flooding, unsafe buildings, fires — report anything and it reaches the right ministry in seconds. Works offline and via SMS.</div>
+    </div>
+    <div class="ob-slide" id="ob2">
+      <div class="ob-emoji">🤖</div>
+      <div class="ob-h">AI that works<br><em>for Sierra Leone</em></div>
+      <div class="ob-p">Our AI engine predicts floods, crime patterns, road risks, and infrastructure failures — giving government intelligence before problems escalate.</div>
+    </div>
+    <div class="ob-slide" id="ob3">
+      <div class="ob-emoji">🏛️</div>
+      <div class="ob-h">Connected to<br><em>WanGov Salone</em></div>
+      <div class="ob-p">CivicLink integrates with the Government of Sierra Leone's digital services portal — one platform for reporting, tracking, and accessing government services.</div>
+    </div>
+    <div class="ob-slide" id="ob4">
+      <div class="ob-emoji">🌍</div>
+      <div class="ob-h">Choose your<br><em>language</em></div>
+      <div class="ob-p">CivicLink speaks Krio, English, Mende, and Temne — so every Sierra Leonean can participate in governance.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px;margin-top:16px;">
+        <div class="lang-opt sel" onclick="selectLang('en',this)"><div class="lang-opt-flag">🇬🇧</div><div><div class="lang-opt-name">English</div></div><div class="lang-opt-check">✓</div></div>
+        <div class="lang-opt" onclick="selectLang('kr',this)"><div class="lang-opt-flag">🇸🇱</div><div><div class="lang-opt-name">Krio</div><div class="lang-opt-sub">Sierra Leone Creole</div></div><div class="lang-opt-check">✓</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ob-bottom">
+    <div class="ob-dots">
+      <div class="ob-dot active" id="dot0"></div>
+      <div class="ob-dot" id="dot1"></div>
+      <div class="ob-dot" id="dot2"></div>
+      <div class="ob-dot" id="dot3"></div>
+      <div class="ob-dot" id="dot4"></div>
+    </div>
+    <button class="ob-next" id="ob-next-btn" onclick="obNext()">Get Started →</button>
+    <button class="ob-skip" onclick="finishOnboard()">Skip intro</button>
+  </div>
+</div>
+
+<!-- ━━━ LANGUAGE OVERLAY ━━━ -->
+<div class="lang-overlay" id="langOverlay" onclick="if(event.target===this)closeLang()">
+  <div class="lang-sheet">
+    <div class="lang-sheet-h">Choose Language</div>
+    <div class="lang-opt sel" onclick="selectLangOverlay('en',this)"><div class="lang-opt-flag">🇬🇧</div><div><div class="lang-opt-name">English</div></div><div class="lang-opt-check">✓</div></div>
+    <div class="lang-opt" onclick="selectLangOverlay('kr',this)"><div class="lang-opt-flag">🇸🇱</div><div><div class="lang-opt-name">Krio</div><div class="lang-opt-sub">Sierra Leone Creole</div></div><div class="lang-opt-check">✓</div></div>
+    <div class="lang-opt" onclick="selectLangOverlay('mn',this)"><div class="lang-opt-flag">🇸🇱</div><div><div class="lang-opt-name">Mende</div><div class="lang-opt-sub">Southern Province</div></div><div class="lang-opt-check">✓</div></div>
+    <div class="lang-opt" onclick="selectLangOverlay('tm',this)"><div class="lang-opt-flag">🇸🇱</div><div><div class="lang-opt-name">Temne</div><div class="lang-opt-sub">Northern Province</div></div><div class="lang-opt-check">✓</div></div>
+  </div>
+</div>
+
+<!-- ━━━ DISTRICT OVERLAY ━━━ -->
+<div class="district-overlay" id="districtOverlay" onclick="if(event.target===this)closeDistrict()">
+  <div class="district-sheet">
+    <div class="ds-h">📍 Select Your District</div>
+    <div class="district-grid" id="districtGrid"></div>
+  </div>
+</div>
+
+<!-- ━━━ HEADER ━━━ -->
+<div class="header" id="mainHeader" style="display:none;">
+  <div class="header-top">
+    <div class="flag-sm"><div class="fg"></div><div class="fw"></div><div class="fb"></div></div>
+    <div class="brand">Civic<span>Link</span></div>
+    <div class="header-right">
+      <button class="hbtn" onclick="showLang()">🌍</button>
+      <button class="hbtn" onclick="switchScreen('alerts')">🔔<div class="bdot"></div></button>
+      <div class="av" id="userAv" onclick="switchScreen('profile')">AK</div>
+    </div>
+  </div>
+  <div class="mode-tabs" id="modeTabs">
+    <div class="mtab active" onclick="switchMode('citizen')">Citizen</div>
+    <div class="mtab" onclick="switchMode('gov')">Gov Portal</div>
+    <div class="mtab" onclick="switchMode('ai')">AI Engine</div>
+    <div class="mtab" onclick="switchMode('transparency')">Open Data</div>
+    <div class="mtab" onclick="switchMode('wangov')">WanGov</div>
+    <div class="mtab" onclick="switchMode('landing')">About</div>
+  </div>
+</div>
+
+<div class="live-bar" id="liveBar" style="display:none;">
+  <div class="pip"></div>
+  <div class="lb-text">Live · <b>47 reports</b> active across Sierra Leone</div>
+  <div class="lb-wangov" onclick="switchMode('wangov')">🏛️ WanGov</div>
+</div>
+<div class="offline-banner" id="offlineBanner">⚠️ Offline Mode — Reports saved locally, will sync when connected</div>
+<div class="ussd-bar" id="ussdBar" onclick="switchScreen('ussd')" style="display:none;">📱 No smartphone? SMS: <b>text REPORT to 717</b> · USSD: <b>*717#</b> · <u>See demo →</u></div>
+
+<!-- ━━━ CONTENT ━━━ -->
+<div class="content" id="mainContent" style="display:none;">
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="hero">
+      <div class="hero-kicker">Sierra Leone · Citizen Intelligence Network</div>
+      <div class="hero-h" id="hero-h">Your eyes become<br><em>government intelligence.</em></div>
+      <div class="hero-loc" onclick="openDistrict()">
+        <span style="font-size:16px;">📍</span>
+        <div class="hero-loc-text">Reporting from <b id="current-district">Western Area, Freetown</b></div>
+        <div class="hero-loc-change">Change</div>
+      </div>
+      <div class="pulse-row"><div class="pip"></div><b>47</b> active issues · <b>8</b> agencies responding now</div>
+    </div>
+    <div class="metrics-row">
+      <div class="met red"><div class="met-num">7</div><div class="met-lbl">Critical</div></div>
+      <div class="met gold"><div class="met-num">34</div><div class="met-lbl">In Progress</div></div>
+      <div class="met green"><div class="met-num">89</div><div class="met-lbl">Resolved</div></div>
+    </div>
+    <div class="sec-row"><div class="sec-title" id="report-issue-label">Report an Issue</div><div class="sec-link" onclick="switchScreen('report')">+ New</div></div>
+    <div class="cat-scroll">
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#FEE2E2;">🛣️</div><div class="cc-lbl">Roads</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#FFF3CD;">⚡</div><div class="cc-lbl">Electric</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#DBEAFE;">🌊</div><div class="cc-lbl">Flooding</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#FFEDD5;">🔥</div><div class="cc-lbl">Fire</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#EDE9FE;">🏚️</div><div class="cc-lbl">Buildings</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#DCFCE7;">🌳</div><div class="cc-lbl">Environment</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#FCE7F3;">🏥</div><div class="cc-lbl">Health</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#F3F4F6;">🚨</div><div class="cc-lbl">Security</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#FEF9C3;">💧</div><div class="cc-lbl">Water</div></div>
+      <div class="cat-chip" onclick="switchScreen('report')"><div class="cc-icon" style="background:#FEE2E2;">⚖️</div><div class="cc-lbl">Corruption</div></div>
+    </div>
+
+    <!-- WanGov Integration Card -->
+    <div class="sec-row" style="padding-top:14px;"><div class="sec-title">🏛️ WanGov Salone Services</div><div class="sec-link" onclick="switchMode('wangov')">View All</div></div>
+    <div class="wangov-card" onclick="switchMode('wangov')">
+      <div class="wg-header">
+        <div class="wg-logo">🏛️</div>
+        <div><div class="wg-title">WanGov Salone</div><div class="wg-sub">Government of Sierra Leone Digital Portal</div></div>
+        <div class="wg-badge">🟢 Live</div>
+      </div>
+      <div class="wg-services">
+        <div class="wg-svc"><div class="wg-svc-icon">📋</div><div class="wg-svc-lbl">NRA Tax</div></div>
+        <div class="wg-svc"><div class="wg-svc-icon">🪪</div><div class="wg-svc-lbl">NID Card</div></div>
+        <div class="wg-svc"><div class="wg-svc-icon">🏥</div><div class="wg-svc-lbl">Health</div></div>
+        <div class="wg-svc"><div class="wg-svc-icon">🎓</div><div class="wg-svc-lbl">Education</div></div>
+        <div class="wg-svc"><div class="wg-svc-icon">🏘️</div><div class="wg-svc-lbl">Land Reg.</div></div>
+        <div class="wg-svc"><div class="wg-svc-icon">📊</div><div class="wg-svc-lbl">Permits</div></div>
+      </div>
+    </div>
+
+    <div class="sec-row"><div class="sec-title">Live Issues Near You</div><div class="sec-link" onclick="switchScreen('feed')">Map View</div></div>
+    <div class="rstack">
+      <div class="rcard" onclick="switchScreen('tracker')">
+        <div class="rcard-bar" style="background:var(--red);"></div>
+        <div class="rcard-body">
+          <div class="rcard-top"><div><div class="rcard-cat">🛣️ Road Damage</div><div class="rcard-title">Collapsed bridge on Kissy Road, East Freetown</div><div class="ai-badge">🤖 AI: Critical · Life risk</div></div><span class="pill pill-red">Critical</span></div>
+          <div class="rcard-meta"><span>📍 East Freetown</span><span>🕐 2h ago</span><span>⬆️ 18</span></div>
+          <div class="rcard-dept">→ Ministry of Works · FCC Roads Unit</div>
+        </div>
+      </div>
+      <div class="rcard">
+        <div class="rcard-bar" style="background:var(--orange);"></div>
+        <div class="rcard-body">
+          <div class="rcard-top"><div><div class="rcard-cat">⚡ Electricity</div><div class="rcard-title">Fallen live pole blocking junction, Murray Town</div><div class="ai-badge">🤖 AI: High · Electrocution risk</div></div><span class="pill pill-orange">High</span></div>
+          <div class="rcard-meta"><span>📍 Murray Town</span><span>🕐 5h ago</span><span>⬆️ 9</span></div>
+          <div class="rcard-dept">→ EDSA · Ministry of Energy</div>
+        </div>
+      </div>
+      <div class="rcard">
+        <div class="rcard-bar" style="background:var(--green);"></div>
+        <div class="rcard-body">
+          <div class="rcard-top"><div><div class="rcard-cat">🌊 Flooding</div><div class="rcard-title">Blocked drainage — Wellington Street cleared</div></div><span class="pill pill-green">Resolved ✓</span></div>
+          <div class="rcard-meta"><span>📍 Wellington</span><span>🕐 1d ago</span><span>⬆️ 41</span></div>
+          <div class="rcard-dept" style="color:var(--green);">✓ FCC Drainage — resolved in 38hrs</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:16px;"></div>
+  </div>
+
+  <!-- REPORT -->
+  <div class="screen" id="screen-report">
+    <div class="rform">
+      <div class="rform-h" id="report-h">Report an Issue</div>
+      <div class="rform-sub" id="report-sub">Sent directly to the responsible ministry, agency & local council.</div>
+      <div class="fl"><label id="cat-label">Category</label></div>
+      <div class="cat-grid" id="catGrid">
+        <button class="cbtn sel" onclick="pickCat(this,'road')"><span class="ci">🛣️</span>Road Damage</button>
+        <button class="cbtn" onclick="pickCat(this,'electricity')"><span class="ci">⚡</span>Electricity</button>
+        <button class="cbtn" onclick="pickCat(this,'flood')"><span class="ci">🌊</span>Flooding</button>
+        <button class="cbtn" onclick="pickCat(this,'building')"><span class="ci">🏚️</span>Buildings</button>
+        <button class="cbtn" onclick="pickCat(this,'fire')"><span class="ci">🔥</span>Fire Hazard</button>
+        <button class="cbtn" onclick="pickCat(this,'environment')"><span class="ci">🌳</span>Environment</button>
+        <button class="cbtn" onclick="pickCat(this,'health')"><span class="ci">🏥</span>Health</button>
+        <button class="cbtn" onclick="pickCat(this,'security')"><span class="ci">🚨</span>Security</button>
+        <button class="cbtn" onclick="pickCat(this,'water')"><span class="ci">💧</span>Water Supply</button>
+        <button class="cbtn" onclick="pickCat(this,'corruption')"><span class="ci">⚖️</span>Corruption</button>
+      </div>
+      <div class="route-box">
+        <div class="route-lbl">📡 Auto-routing to</div>
+        <div id="routeItems">
+          <div class="route-item"><div class="ri-dot"></div>Ministry of Works, Housing &amp; Infrastructure</div>
+          <div class="route-item"><div class="ri-dot"></div>Freetown City Council — Roads Unit</div>
+          <div class="route-item"><div class="ri-dot"></div>District Officer, Western Area</div>
+        </div>
+      </div>
+      <div class="fl"><label id="title-label">Title</label><input class="fi" type="text" placeholder="Brief summary..."></div>
+      <div class="fl"><label id="desc-label">Description</label><textarea class="ft" placeholder="Describe what you see..."></textarea></div>
+      <div class="fl"><label id="loc-label">Location</label><input class="fi" type="text" id="loc-input" placeholder="📍 Tap to use GPS or type address"></div>
+      <div class="fl"><label id="sev-label">Urgency</label>
+        <div class="sev-row">
+          <div class="sbtn low" onclick="pickSev(this)">🟢 Low</div>
+          <div class="sbtn med s" onclick="pickSev(this)">🟡 Medium</div>
+          <div class="sbtn high" onclick="pickSev(this)">🟠 High</div>
+          <div class="sbtn crit" onclick="pickSev(this)">🔴 Critical</div>
+        </div>
+      </div>
+      <div class="fl"><label>Evidence</label>
+        <div class="upload-zone"><div class="uz-icon">📷</div><div>Attach photo, video or audio</div><div style="font-size:10px;margin-top:3px;color:var(--muted);">JPG · MP4 · MP3 · Max 50MB</div></div>
+      </div>
+      <div class="anon-row">
+        <div><div style="font-size:13px;font-weight:700;">🔒 Submit Anonymously</div><div style="font-size:11px;color:var(--muted);">Your identity hidden from all departments</div></div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <button class="btn-green" onclick="submitReport()">📤 Submit Report to Government</button>
+      <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:8px;">Unique tracking ID · Full audit trail · WanGov linked</div>
+    </div>
+  </div>
+
+  <!-- TRACKER -->
+  <div class="screen" id="screen-tracker">
+    <div class="pad">
+      <div class="sec-row" style="padding:4px 0 12px;"><div class="sec-title">My Reports</div><div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);">3 active</div></div>
+      <div class="tcard">
+        <div class="tc-head"><div><div class="tc-title">🛣️ Collapsed bridge — Kissy Road</div><div class="tc-id">#SC-2025-0482 · 2h ago</div></div><span class="pill pill-red">Critical</span></div>
+        <div class="pbar">
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Sent</div></div>
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Received</div></div>
+          <div class="pstep now"><div class="pdot">→</div><div class="plbl">Assigned</div></div>
+          <div class="pstep"><div class="pdot">4</div><div class="plbl">Action</div></div>
+          <div class="pstep"><div class="pdot">5</div><div class="plbl">Resolved</div></div>
+        </div>
+        <div class="tc-resp"><span style="font-size:16px;">🏛️</span><div><div class="tcr-dept">Ministry of Works — Roads Unit</div>Received & assigned to Eng. Koroma. Field team dispatched.</div></div>
+      </div>
+      <div class="tcard">
+        <div class="tc-head"><div><div class="tc-title">🌊 Blocked drainage — Wellington St.</div><div class="tc-id">#SC-2025-0461 · 3d ago</div></div><span class="pill pill-green">Resolved ✓</span></div>
+        <div class="pbar">
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Sent</div></div>
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Received</div></div>
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Assigned</div></div>
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Action</div></div>
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Resolved</div></div>
+        </div>
+        <div class="tc-resp" style="background:var(--green-tint);"><span style="font-size:16px;">✅</span><div><div class="tcr-dept" style="color:var(--green);">FCC Drainage · Resolved in 38hrs</div>Drainage cleared. Thank you for reporting.</div></div>
+        <div class="tc-rate">Rate response: <div style="display:flex;gap:2px;"><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span><span class="star" onclick="showToast('⭐ Thanks for your feedback')">☆</span></div></div>
+      </div>
+      <div class="tcard">
+        <div class="tc-head"><div><div class="tc-title">🌳 Illegal logging — Waterloo Reserve</div><div class="tc-id">#SC-2025-0440 · 6d ago</div></div><span class="pill pill-gold">In Review</span></div>
+        <div class="pbar">
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Sent</div></div>
+          <div class="pstep done"><div class="pdot">✓</div><div class="plbl">Received</div></div>
+          <div class="pstep now"><div class="pdot">→</div><div class="plbl">Assigned</div></div>
+          <div class="pstep"><div class="pdot">4</div><div class="plbl">Action</div></div>
+          <div class="pstep"><div class="pdot">5</div><div class="plbl">Resolved</div></div>
+        </div>
+        <div class="tc-resp"><span style="font-size:16px;">🌿</span><div><div class="tcr-dept">EPA Sierra Leone · Forestry Division</div>Officer visits site Friday. Escalation path: EPA → Ministry → National Dashboard.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEED -->
+  <div class="screen" id="screen-feed">
+    <div class="ftabs"><div class="ftab active">All</div><div class="ftab">Roads</div><div class="ftab">Electric</div><div class="ftab">Flooding</div><div class="ftab">Environment</div><div class="ftab">Resolved</div></div>
+    <div class="map-box">
+      <div class="map-grid"></div><div class="map-rh"></div><div class="map-rv"></div><div class="map-rv2"></div>
+      <div class="map-lbl">📍 Western Area · Freetown</div>
+      <div class="mpin" style="left:35%;top:45%;"><div class="mpin-dot" style="background:var(--red);"></div></div>
+      <div class="mpin" style="left:56%;top:30%;"><div class="mpin-dot" style="background:var(--orange);"></div></div>
+      <div class="mpin" style="left:73%;top:58%;"><div class="mpin-dot" style="background:var(--orange);"></div></div>
+      <div class="mpin" style="left:24%;top:64%;"><div class="mpin-dot" style="background:var(--green2);"></div></div>
+      <div class="mpin" style="left:81%;top:38%;"><div class="mpin-dot" style="background:var(--red);"></div></div>
+      <div class="map-legend">
+        <div class="mleg"><div class="mleg-dot" style="background:var(--red);"></div>Critical</div>
+        <div class="mleg"><div class="mleg-dot" style="background:var(--orange);"></div>High</div>
+        <div class="mleg"><div class="mleg-dot" style="background:var(--green2);"></div>Resolved</div>
+      </div>
+    </div>
+    <div class="rstack" style="padding-bottom:80px;">
+      <div class="rcard"><div class="rcard-bar" style="background:var(--red);"></div><div class="rcard-body"><div class="rcard-top"><div><div class="rcard-cat">🔥 Fire Hazard</div><div class="rcard-title">Warehouse fire risk — Congo Cross Market</div><div class="ai-badge">🤖 Evacuate risk zone</div></div><span class="pill pill-red">Critical</span></div><div class="rcard-meta"><span>📍 Congo Cross</span><span>🕐 45m</span><span>⬆️ 67</span></div></div></div>
+      <div class="rcard"><div class="rcard-bar" style="background:var(--red);"></div><div class="rcard-body"><div class="rcard-top"><div><div class="rcard-cat">🛣️ Road Damage</div><div class="rcard-title">Collapsed bridge — Kissy Road</div></div><span class="pill pill-red">Critical</span></div><div class="rcard-meta"><span>📍 East Freetown</span><span>🕐 2h</span><span>⬆️ 23</span></div></div></div>
+      <div class="rcard"><div class="rcard-bar" style="background:var(--orange);"></div><div class="rcard-body"><div class="rcard-top"><div><div class="rcard-cat">🏚️ Unsafe Building</div><div class="rcard-title">Structurally compromised 3-storey — Lumley</div></div><span class="pill pill-orange">High</span></div><div class="rcard-meta"><span>📍 Lumley</span><span>🕐 4h</span><span>⬆️ 18</span></div></div></div>
+      <div class="rcard"><div class="rcard-bar" style="background:var(--green);"></div><div class="rcard-body"><div class="rcard-top"><div><div class="rcard-cat">🌊 Flooding</div><div class="rcard-title">Wellington drainage — cleared</div></div><span class="pill pill-green">Resolved ✓</span></div><div class="rcard-meta"><span>📍 Wellington</span><span>🕐 1d</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="screen" id="screen-alerts">
+    <div class="pad">
+      <div class="sec-row" style="padding:4px 0 12px;"><div class="sec-title">Emergency Alerts</div><div style="font-size:10px;color:var(--muted);">Government Broadcasts</div></div>
+      <div class="alert-card emr"><div class="alert-type">⚠️ Emergency Alert</div><div class="alert-title">Flood Warning — Eastern Freetown</div><div class="alert-body">Heavy rainfall 48hrs. Residents in Kissy and Calaba Town advised to move to higher ground. Shelters open at King Tom Community Centre and St. Edward's Secondary School.</div><div class="alert-meta">🏛️ National Disaster Management Agency · 09:15 today</div><button class="alert-act">📍 Find nearest shelter</button></div>
+      <div class="alert-card warn"><div class="alert-type">🔶 Road Closure</div><div class="alert-title">Kissy Road Closed — Bridge Collapse</div><div class="alert-body">Kissy Road between junction 7 and ferry terminal closed. Use Wilberforce or Lumley Road.</div><div class="alert-meta">🏛️ Ministry of Works · 07:42 today</div><button class="alert-act">🗺️ Alternative route</button></div>
+      <div class="alert-card info"><div class="alert-type">ℹ️ Public Health</div><div class="alert-title">Cholera Prevention — Murray Town</div><div class="alert-body">Boil all drinking water. Free purification tablets at Mountain Cut Road community health post.</div><div class="alert-meta">🏛️ Ministry of Health · Yesterday</div><button class="alert-act">📋 Full advisory</button></div>
+      <div class="alert-card ok"><div class="alert-type">✅ Alert Lifted</div><div class="alert-title">Wellington Drainage — Resolved</div><div class="alert-body">Flooding risk returned to normal. Thanks to 12 citizens who reported this issue.</div><div class="alert-meta">🏛️ Freetown City Council · 38hrs after first report</div></div>
+    </div>
+  </div>
+
+  <!-- WANGOV SCREEN -->
+  <div class="screen" id="screen-wangov">
+    <div class="wg-hero">
+      <div class="wg-hero-h">🏛️ WanGov Salone</div>
+      <div class="wg-hero-sub">Government of Sierra Leone — Digital Services Portal</div>
+      <input class="wg-search" type="text" placeholder="🔍 Search government services...">
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <div class="wg-status"><div class="wg-status-dot"></div>System Online</div>
+        <div style="margin-left:auto;font-size:10px;color:rgba(255,255,255,.55);">wangov.gov.sl · Integrated</div>
+      </div>
+    </div>
+    <div class="wg-cats">
+      <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.5px;margin-bottom:4px;">GOVERNMENT SERVICES — LINKED TO CIVICLINK</div>
+
+      <div class="wg-cat-card">
+        <div class="wg-cat-top"><div class="wg-cat-icon">📋</div><div><div class="wg-cat-name">NRA — Tax & Revenue</div><div class="wg-cat-sub">National Revenue Authority · File returns, pay taxes, get TIN</div></div></div>
+        <div class="wg-svc-list"><div class="wg-svc-pill">File Tax Return</div><div class="wg-svc-pill">Pay Online</div><div class="wg-svc-pill">Get TIN</div><div class="wg-svc-pill">Tax Clearance</div></div>
+        <button class="wg-link-btn" onclick="openWanGov('https://nra.gov.sl')">Open NRA Portal →</button>
+      </div>
+
+      <div class="wg-cat-card">
+        <div class="wg-cat-top"><div class="wg-cat-icon">🪪</div><div><div class="wg-cat-name">NASSIT — National ID &amp; Pensions</div><div class="wg-cat-sub">Social security, NID registration, pension claims</div></div></div>
+        <div class="wg-svc-list"><div class="wg-svc-pill">Register NID</div><div class="wg-svc-pill">Pension Status</div><div class="wg-svc-pill">Benefits</div></div>
+        <button class="wg-link-btn" onclick="openWanGov('https://nassit.gov.sl')">Open NASSIT →</button>
+      </div>
+
+      <div class="wg-cat-card">
+        <div class="wg-cat-top"><div class="wg-cat-icon">🏥</div><div><div class="wg-cat-name">Ministry of Health</div><div class="wg-cat-sub">Health facilities, DHMT, outbreak reporting, Free Healthcare</div></div></div>
+        <div class="wg-svc-list"><div class="wg-svc-pill">Find Clinic</div><div class="wg-svc-pill">Report Outbreak</div><div class="wg-svc-pill">Free Healthcare</div><div class="wg-svc-pill">Vaccination</div></div>
+        <button class="wg-link-btn" onclick="openWanGov('https://mohs.gov.sl')">Open Health Portal →</button>
+      </div>
+
+      <div class="wg-cat-card">
+        <div class="wg-cat-top"><div class="wg-cat-icon">🏘️</div><div><div class="wg-cat-name">Ministry of Lands &amp; Planning</div><div class="wg-cat-sub">Land registration, building permits, property certificates</div></div></div>
+        <div class="wg-svc-list"><div class="wg-svc-pill">Building Permit</div><div class="wg-svc-pill">Land Certificate</div><div class="wg-svc-pill">Deed Search</div></div>
+        <button class="wg-link-btn" onclick="openWanGov('https://lands.gov.sl')">Open Lands Portal →</button>
+      </div>
+
+      <div class="wg-cat-card">
+        <div class="wg-cat-top"><div class="wg-cat-icon">🎓</div><div><div class="wg-cat-name">Ministry of Education</div><div class="wg-cat-sub">BECE/WASSCE, school registration, MBSSE services</div></div></div>
+        <div class="wg-svc-list"><div class="wg-svc-pill">Exam Results</div><div class="wg-svc-pill">School Report</div><div class="wg-svc-pill">Scholarships</div></div>
+        <button class="wg-link-btn" onclick="openWanGov('https://mbsse.gov.sl')">Open Education Portal →</button>
+      </div>
+
+      <div class="wg-cat-card" style="border-color:var(--green);border-width:2px;">
+        <div class="wg-cat-top"><div class="wg-cat-icon" style="background:var(--green-tint);">🔗</div><div><div class="wg-cat-name" style="color:var(--green);">CivicLink ↔ WanGov Bridge</div><div class="wg-cat-sub">Reports filed via CivicLink auto-sync to WanGov ministry dashboards</div></div></div>
+        <div class="wg-svc-list"><div class="wg-svc-pill" style="background:var(--green-tint);color:var(--green);">Auto-Routing ✓</div><div class="wg-svc-pill" style="background:var(--green-tint);color:var(--green);">Real-time Sync ✓</div><div class="wg-svc-pill" style="background:var(--green-tint);color:var(--green);">Audit Trail ✓</div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">Every CivicLink report is tagged with the citizen's WanGov NID, routed to the correct ministry dashboard, and tracked through to resolution — creating a fully accountable governance loop.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOV PORTAL -->
+  <div class="screen" id="screen-gov">
+    <div class="gov-login" id="gov-login-view">
+      <div class="gov-login-hero">
+        <div class="gov-crest">🏛️</div>
+        <div class="gov-login-h">Government Command Portal</div>
+        <div class="gov-login-sub">CivicLink · Restricted Access · Sierra Leone</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:10px;text-align:left;width:100%;">SELECT YOUR MINISTRY</div>
+      <div class="min-select">
+        <div class="min-btn sel" onclick="selectMin(this)"><div class="min-icon">🛣️</div><div class="min-name">Ministry of Works</div></div>
+        <div class="min-btn" onclick="selectMin(this)"><div class="min-icon">⚡</div><div class="min-name">Ministry of Energy</div></div>
+        <div class="min-btn" onclick="selectMin(this)"><div class="min-icon">🏥</div><div class="min-name">Ministry of Health</div></div>
+        <div class="min-btn" onclick="selectMin(this)"><div class="min-icon">🌳</div><div class="min-name">EPA / Environment</div></div>
+        <div class="min-btn" onclick="selectMin(this)"><div class="min-icon">🚨</div><div class="min-name">Sierra Leone Police</div></div>
+        <div class="min-btn" onclick="selectMin(this)"><div class="min-icon">🏘️</div><div class="min-name">Ministry of Lands</div></div>
+      </div>
+      <input class="fi gov-pass" type="password" placeholder="🔑 Access Code (demo: 1234)">
+      <button class="gov-enter" onclick="govLogin()">Enter Command Dashboard →</button>
+    </div>
+    <div class="gov-dash" id="gov-dash-view" style="display:none;">
+      <div class="gov-hero-strip">
+        <div class="gov-hero-h">🛣️ Ministry of Works — Command Centre</div>
+        <div class="gov-stats-g">
+          <div class="gs r"><div class="gs-num">7</div><div class="gs-lbl">Critical Incidents</div></div>
+          <div class="gs y"><div class="gs-num">34</div><div class="gs-lbl">Open Cases</div></div>
+          <div class="gs g"><div class="gs-num">89%</div><div class="gs-lbl">Resolve Rate</div></div>
+          <div class="gs"><div class="gs-num" style="color:#93C5FD;">26h</div><div class="gs-lbl">Avg Response</div></div>
+        </div>
+      </div>
+      <div class="sec-h" style="padding:0 0 8px;"><div class="dot"></div>AI Priority Queue</div>
+      <div class="iq-card c"><div class="iq-score"><div class="iq-snum" style="color:var(--red);">97</div><div class="iq-slbl">SCORE</div></div><div style="flex:1;"><div class="iq-title">🛣️ Collapsed bridge — Kissy Road</div><div class="iq-meta">📍 East Freetown · Life risk · 23 reports · 2h ago</div><button class="assign-btn" onclick="showToast('✅ Team assigned to Kissy Road')">Assign Team →</button></div><span class="pill pill-red">Critical</span></div>
+      <div class="iq-card c"><div class="iq-score"><div class="iq-snum" style="color:var(--red);">91</div><div class="iq-slbl">SCORE</div></div><div style="flex:1;"><div class="iq-title">🔥 Fire risk — Congo Cross Market</div><div class="iq-meta">📍 Congo Cross · 67 views · 45m ago</div><button class="assign-btn" style="background:var(--red);" onclick="showToast('🚒 SLFF dispatched')">Dispatch SLFF →</button></div><span class="pill pill-red">Critical</span></div>
+      <div class="iq-card h"><div class="iq-score"><div class="iq-snum" style="color:var(--orange);">74</div><div class="iq-slbl">SCORE</div></div><div style="flex:1;"><div class="iq-title">⚡ Live pole down — Murray Town</div><div class="iq-meta">📍 Murray Town · Electrocution risk · 5h ago</div><button class="assign-btn" style="background:var(--orange);" onclick="showToast('⚡ EDSA notified')">Assign EDSA →</button></div><span class="pill pill-orange">High</span></div>
+      <div style="height:12px;"></div>
+      <div class="sec-h" style="padding:0 0 8px;"><div class="dot"></div>Agency Scorecard</div>
+      <div class="card">
+        <div class="sc-row"><div class="sc-rank">1</div><div class="sc-agency">FCC — Drainage</div><div class="sc-track"><div class="sc-fill" style="width:94%;background:var(--green2);"></div></div><div class="sc-pct" style="color:var(--green);">94%</div></div>
+        <div class="sc-row"><div class="sc-rank">2</div><div class="sc-agency">Ministry of Works</div><div class="sc-track"><div class="sc-fill" style="width:87%;background:var(--green2);"></div></div><div class="sc-pct" style="color:var(--green);">87%</div></div>
+        <div class="sc-row"><div class="sc-rank">3</div><div class="sc-agency">EPA Sierra Leone</div><div class="sc-track"><div class="sc-fill" style="width:79%;background:var(--green2);"></div></div><div class="sc-pct" style="color:var(--green);">79%</div></div>
+        <div class="sc-row"><div class="sc-rank">4</div><div class="sc-agency">EDSA — Electricity</div><div class="sc-track"><div class="sc-fill" style="width:61%;background:var(--gold);"></div></div><div class="sc-pct" style="color:var(--gold);">61%</div></div>
+        <div class="sc-row"><div class="sc-rank">5</div><div class="sc-agency">Ministry of Health</div><div class="sc-track"><div class="sc-fill" style="width:43%;background:var(--red);"></div></div><div class="sc-pct" style="color:var(--red);">43%</div></div>
+      </div>
+      <div class="sec-h" style="padding:0 0 8px;"><div class="dot"></div>Escalation Framework</div>
+      <div class="card">
+        <div class="escal-row">
+          <div class="escal-step"><div class="escal-lbl" style="background:var(--green-tint);color:var(--green);">Local Officer</div><div class="escal-time">48h SLA</div></div>
+          <div class="escal-arr">→</div>
+          <div class="escal-step"><div class="escal-lbl" style="background:var(--gold-tint);color:var(--gold);">District</div><div class="escal-time">72h SLA</div></div>
+          <div class="escal-arr">→</div>
+          <div class="escal-step"><div class="escal-lbl" style="background:var(--orange-tint);color:var(--orange);">Ministry</div><div class="escal-time">7d SLA</div></div>
+          <div class="escal-arr">→</div>
+          <div class="escal-step"><div class="escal-lbl" style="background:var(--red-tint);color:var(--red);">State House</div><div class="escal-time">National</div></div>
+        </div>
+      </div>
+      <button class="btn-green" style="background:var(--blue);margin-top:4px;" onclick="document.getElementById('gov-dash-view').style.display='none';document.getElementById('gov-login-view').style.display='flex';">← Log Out</button>
+    </div>
+  </div>
+
+  <!-- TRANSPARENCY DASHBOARD -->
+  <div class="screen" id="screen-transparency">
+    <div class="trans-hero">
+      <div class="trans-h">Open Data Dashboard</div>
+      <div class="trans-sub">Public accountability — every report, every response, every metric</div>
+      <div class="open-data-badge">📊 Open Data · Updated Live · Exportable</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-num">1,247</div><div class="kpi-lbl">Total Reports This Month</div><div class="kpi-trend up">↑ 23% vs last month</div></div>
+      <div class="kpi"><div class="kpi-num">78%</div><div class="kpi-lbl">Resolution Rate</div><div class="kpi-trend up">↑ 12% vs last month</div></div>
+      <div class="kpi warn"><div class="kpi-num">26h</div><div class="kpi-lbl">Avg. Gov Response Time</div><div class="kpi-trend down">↓ Improving</div></div>
+      <div class="kpi bad"><div class="kpi-num">7</div><div class="kpi-lbl">Critical Unresolved >48h</div><div class="kpi-trend down">↑ Needs attention</div></div>
+    </div>
+    <div class="pad" style="padding-top:12px;">
+      <div class="sec-h"><div class="dot"></div>Reports by Category This Month</div>
+      <div class="card">
+        <div class="bar-chart-h">
+          <div class="bc-col"><div class="bc-val">312</div><div class="bc-bar" style="height:100%;background:var(--red);"></div><div class="bc-lbl">Roads</div></div>
+          <div class="bc-col"><div class="bc-val">198</div><div class="bc-bar" style="height:63%;background:var(--gold);"></div><div class="bc-lbl">Flood</div></div>
+          <div class="bc-col"><div class="bc-val">187</div><div class="bc-bar" style="height:60%;background:var(--orange);"></div><div class="bc-lbl">Power</div></div>
+          <div class="bc-col"><div class="bc-val">142</div><div class="bc-bar" style="height:45%;background:var(--blue2);"></div><div class="bc-lbl">Health</div></div>
+          <div class="bc-col"><div class="bc-val">98</div><div class="bc-bar" style="height:31%;background:var(--green2);"></div><div class="bc-lbl">Enviro</div></div>
+          <div class="bc-col"><div class="bc-val">87</div><div class="bc-bar" style="height:28%;background:var(--purple2);"></div><div class="bc-lbl">Crime</div></div>
+          <div class="bc-col"><div class="bc-val">223</div><div class="bc-bar" style="height:71%;background:var(--muted);"></div><div class="bc-lbl">Other</div></div>
+        </div>
+      </div>
+      <div class="sec-h"><div class="dot"></div>District Breakdown</div>
+      <div class="card">
+        <div class="sc-row"><div class="sc-rank" style="width:80px;font-size:11px;color:var(--ink);">Western Area</div><div class="sc-track" style="flex:1;"><div class="sc-fill" style="width:89%;background:var(--red);"></div></div><div class="sc-pct" style="color:var(--red);">544</div></div>
+        <div class="sc-row"><div class="sc-rank" style="width:80px;font-size:11px;color:var(--ink);">Bo District</div><div class="sc-track" style="flex:1;"><div class="sc-fill" style="width:41%;background:var(--orange);"></div></div><div class="sc-pct" style="color:var(--orange);">251</div></div>
+        <div class="sc-row"><div class="sc-rank" style="width:80px;font-size:11px;color:var(--ink);">Kenema</div><div class="sc-track" style="flex:1;"><div class="sc-fill" style="width:28%;background:var(--gold);"></div></div><div class="sc-pct" style="color:var(--gold);">172</div></div>
+        <div class="sc-row"><div class="sc-rank" style="width:80px;font-size:11px;color:var(--ink);">Makeni</div><div class="sc-track" style="flex:1;"><div class="sc-fill" style="width:22%;background:var(--blue2);"></div></div><div class="sc-pct" style="color:var(--blue2);">136</div></div>
+        <div class="sc-row"><div class="sc-rank" style="width:80px;font-size:11px;color:var(--ink);">Kailahun</div><div class="sc-track" style="flex:1;"><div class="sc-fill" style="width:15%;background:var(--green2);"></div></div><div class="sc-pct" style="color:var(--green2);">92</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+        <button class="btn-green" style="font-size:12px;padding:10px;" onclick="showToast('📊 Data exported as CSV')">📊 Export CSV</button>
+        <button class="btn-green" style="background:var(--blue);font-size:12px;padding:10px;" onclick="showToast('📡 API link copied')">📡 Copy API Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- USSD SIMULATOR -->
+  <div class="screen" id="screen-ussd">
+    <div class="pad" style="padding-top:14px;">
+      <div class="sec-h" style="margin-bottom:10px;"><div class="dot"></div>USSD & SMS Simulator</div>
+      <div class="ussd-phone">
+        <div class="ussd-screen" id="ussd-screen">
+<span style="color:#8BC34A;">CivicLink Sierra Leone</span>
+<span style="color:#666;">*717#</span>
+
+<span style="color:#FFF;">Welcome to CivicLink</span>
+<span>Report issues to Government</span>
+
+1. Report an Issue
+2. Check Report Status
+3. Emergency Alerts
+4. WanGov Services
+0. Exit
+
+<span style="color:#5CDB5C;">Enter: <span class="ussd-cursor">_</span></span></div>
+        <div class="ussd-keypad">
+          <div class="ussd-key" onclick="ussdKey('1')">1</div><div class="ussd-key" onclick="ussdKey('2')">2</div><div class="ussd-key" onclick="ussdKey('3')">3</div>
+          <div class="ussd-key" onclick="ussdKey('4')">4</div><div class="ussd-key" onclick="ussdKey('5')">5</div><div class="ussd-key" onclick="ussdKey('6')">6</div>
+          <div class="ussd-key" onclick="ussdKey('7')">7</div><div class="ussd-key" onclick="ussdKey('8')">8</div><div class="ussd-key" onclick="ussdKey('9')">9</div>
+          <div class="ussd-key del" onclick="ussdReset()">CLR</div><div class="ussd-key" onclick="ussdKey('0')">0</div><div class="ussd-key action" onclick="ussdSend()">SEND</div>
+        </div>
+      </div>
+      <div class="sms-demo" style="margin:10px 0 0;">
+        <div class="sms-h">📱 SMS Reporting — text REPORT to 717</div>
+        <div class="sms-bubble">REPORT ROAD Kissy Road bridge collapsed near junction 7 URGENT</div>
+        <div class="sms-bubble in">CivicLink SL: Report #SC-2025-0503 received. Routed to Ministry of Works. Track at *717# or civiclink.gov.sl. Thank you.</div>
+        <div class="sms-bubble">STATUS SC-2025-0503</div>
+        <div class="sms-bubble in">Report #SC-2025-0503: ASSIGNED — Eng. Koroma dispatched. Est. inspection 4hrs. Ministry of Works Roads Unit.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI ENGINE -->
+  <div class="screen" id="screen-ai">
+    <div class="ai-screen">
+      <div class="ai-tabs">
+        <div class="aitab active" onclick="switchAiTab(this,'ai-predict')">🎯 Predict</div>
+        <div class="aitab" onclick="switchAiTab(this,'ai-analyze')">🔍 Analyze</div>
+        <div class="aitab" onclick="switchAiTab(this,'ai-forecast')">📈 Forecast</div>
+        <div class="aitab" onclick="switchAiTab(this,'ai-chat')">💬 Analyst</div>
+      </div>
+
+      <!-- Predict -->
+      <div id="ai-predict">
+        <div class="sec-h"><div class="dot"></div>Incident Risk Predictor</div>
+        <select class="fi fs" id="pred-loc"><option>East Freetown — Kissy Area</option><option>Murray Town — Western Freetown</option><option>Waterloo — Southern District</option><option>Bo City — Southern Province</option><option>Kenema — Eastern Province</option><option>Makeni — Northern Province</option></select>
+        <div class="af-grid2" id="predChips">
+          <div class="achip sel" onclick="this.classList.toggle('sel')">🌊 Flood Risk</div>
+          <div class="achip sel" onclick="this.classList.toggle('sel')">🛣️ Road Safety</div>
+          <div class="achip" onclick="this.classList.toggle('sel')">🚨 Crime Pattern</div>
+          <div class="achip" onclick="this.classList.toggle('sel')">⚡ Power Failure</div>
+          <div class="achip" onclick="this.classList.toggle('sel')">🔥 Fire Hazard</div>
+          <div class="achip" onclick="this.classList.toggle('sel')">🏚️ Building Risk</div>
+        </div>
+        <select class="fi fs" id="pred-season"><option>Rainy season (May–October)</option><option>Dry season (November–April)</option><option>Post-heavy-rainfall</option><option>Harmattan season</option></select>
+        <textarea class="ft" id="pred-ctx" placeholder="Recent context: e.g. 3 drainage blockage reports, heavy rain 2 days..."></textarea>
+        <button class="btn-green" id="btn-predict" onclick="runAI('predict')">🤖 Run Risk Prediction</button>
+        <div class="ai-box" id="box-predict" style="display:none;margin-top:10px;">
+          <div class="ai-box-lbl"><div class="pip"></div>AI Prediction · Claude Sonnet</div>
+          <div class="ai-content" id="txt-predict">Analyzing...</div>
+          <div class="ai-meta" id="meta-predict" style="display:none;"><div class="ai-conf" id="conf-predict"></div><button class="ai-act" onclick="exportAI('predict')">📋 Export</button></div>
+        </div>
+        <div class="sec-h" style="margin-top:12px;"><div class="dot"></div>Live Risk Meters</div>
+        <div class="card">
+          <div class="risk-bar"><div class="rb-row"><span>🌊 Flood Risk — East Freetown</span><span style="color:var(--red);">78%</span></div><div class="rb-track"><div class="rb-fill" style="width:78%;background:var(--red);"></div></div></div>
+          <div class="risk-bar"><div class="rb-row"><span>🛣️ Road Safety — Kissy Road</span><span style="color:var(--orange);">65%</span></div><div class="rb-track"><div class="rb-fill" style="width:65%;background:var(--orange);"></div></div></div>
+          <div class="risk-bar"><div class="rb-row"><span>🚨 Crime — Central Freetown</span><span style="color:var(--gold);">41%</span></div><div class="rb-track"><div class="rb-fill" style="width:41%;background:var(--gold);"></div></div></div>
+          <div class="risk-bar" style="margin-bottom:0;"><div class="rb-row"><span>⚡ Power Grid Stability</span><span style="color:var(--green);">28%</span></div><div class="rb-track"><div class="rb-fill" style="width:28%;background:var(--green2);"></div></div></div>
+        </div>
+      </div>
+
+      <!-- Analyze -->
+      <div id="ai-analyze" style="display:none;">
+        <div class="sec-h"><div class="dot"></div>Incident Analyzer</div>
+        <textarea class="ft" id="inc-desc" placeholder="Paste incident report here..."></textarea>
+        <select class="fi fs" id="inc-cat"><option>Road & Infrastructure</option><option>Flooding & Water</option><option>Electricity & Power</option><option>Fire & Emergency</option><option>Crime & Security</option><option>Environment</option><option>Public Health</option><option>Buildings</option></select>
+        <button class="btn-green" id="btn-analyze" onclick="runAI('analyze')">🔍 Analyze Incident</button>
+        <div class="ai-box" id="box-analyze" style="display:none;margin-top:10px;">
+          <div class="ai-box-lbl"><div class="pip"></div>AI Analysis · Claude Sonnet</div>
+          <div class="ai-content" id="txt-analyze"></div>
+          <div class="ai-meta" id="meta-analyze" style="display:none;"><div class="ai-conf" id="conf-analyze"></div><button class="ai-act" onclick="exportAI('analyze')">📋 Export</button></div>
+        </div>
+        <div class="sec-h" style="margin-top:12px;"><div class="dot"></div>Road Safety AI</div>
+        <input class="fi" id="road-inp" type="text" placeholder="Road name, e.g. Kissy Road, Bo-Kenema Highway...">
+        <textarea class="ft" id="road-ctx" placeholder="Incident data, accident reports, pothole reports..."></textarea>
+        <button class="btn-green" id="btn-road" onclick="runAI('road')">🚦 Road Safety Assessment</button>
+        <div class="ai-box" id="box-road" style="display:none;margin-top:10px;">
+          <div class="ai-box-lbl"><div class="pip"></div>Road Safety · Claude Sonnet</div>
+          <div class="ai-content" id="txt-road"></div>
+          <div class="ai-meta" id="meta-road" style="display:none;"><div class="ai-conf" id="conf-road"></div><button class="ai-act" onclick="exportAI('road')">📋 Export</button></div>
+        </div>
+        <div class="sec-h" style="margin-top:12px;"><div class="dot"></div>Auto-Triage</div>
+        <textarea class="ft" id="triage-inp" placeholder="Paste citizen report text to auto-triage..."></textarea>
+        <button class="btn-green" id="btn-triage" onclick="runAI('triage')">⚡ Auto-Triage Report</button>
+        <div class="ai-box" id="box-triage" style="display:none;margin-top:10px;">
+          <div class="ai-box-lbl"><div class="pip"></div>Auto-Triage · Claude Sonnet</div>
+          <div class="ai-content" id="txt-triage"></div>
+          <div class="ai-meta" id="meta-triage" style="display:none;"><div class="ai-conf" id="conf-triage"></div><button class="ai-act" onclick="exportAI('triage')">📋 Export</button></div>
+        </div>
+      </div>
+
+      <!-- Forecast -->
+      <div id="ai-forecast" style="display:none;">
+        <div class="sec-h"><div class="dot"></div>7-Day Incident Forecast</div>
+        <select class="fi fs" id="fc-loc"><option>Freetown, Western Area</option><option>Bo District</option><option>Kenema District</option><option>Makeni, Bombali</option><option>Nationwide Sierra Leone</option></select>
+        <div class="af-grid2">
+          <div class="achip sel" onclick="this.classList.toggle('sel')">🌊 Flooding</div>
+          <div class="achip sel" onclick="this.classList.toggle('sel')">🛣️ Roads</div>
+          <div class="achip" onclick="this.classList.toggle('sel')">🔥 Fire</div>
+          <div class="achip" onclick="this.classList.toggle('sel')">⚡ Power</div>
+        </div>
+        <button class="btn-green" id="btn-forecast" onclick="runAI('forecast')" style="margin-top:10px;">📈 Generate 7-Day Forecast</button>
+        <div class="ai-box" id="box-forecast" style="display:none;margin-top:10px;">
+          <div class="ai-box-lbl"><div class="pip"></div>7-Day Forecast · Claude Sonnet</div>
+          <div class="ai-content" id="txt-forecast"></div>
+          <div class="ai-meta" id="meta-forecast" style="display:none;"><div class="ai-conf" id="conf-forecast"></div><button class="ai-act" onclick="exportAI('forecast')">📋 Export</button></div>
+        </div>
+        <div class="sec-h" style="margin-top:12px;"><div class="dot"></div>Crime Intelligence</div>
+        <input class="fi" id="crime-area" type="text" placeholder="Area, e.g. Congo Cross weekend evenings...">
+        <textarea class="ft" id="crime-ctx" placeholder="Known patterns, recent incidents..."></textarea>
+        <button class="btn-green" id="btn-crime" onclick="runAI('crime')">🚨 Crime Intelligence Report</button>
+        <div class="ai-box" id="box-crime" style="display:none;margin-top:10px;">
+          <div class="ai-box-lbl"><div class="pip"></div>Crime Intelligence · Claude Sonnet</div>
+          <div class="ai-content" id="txt-crime"></div>
+          <div class="ai-meta" id="meta-crime" style="display:none;"><div class="ai-conf" id="conf-crime"></div><button class="ai-act" onclick="exportAI('crime')">📋 Export</button></div>
+        </div>
+      </div>
+
+      <!-- Chat Analyst -->
+      <div id="ai-chat" style="display:none;">
+        <div class="ai-box" style="margin-bottom:10px;">
+          <div class="ai-box-lbl"><div class="pip"></div>AI Governance Analyst</div>
+          <div class="ai-content">Ask anything about Sierra Leone governance, incident patterns, agency performance, resource allocation, flood zones, road safety, or crime trends.</div>
+        </div>
+        <div class="prompt-chips">
+          <div class="pchip" onclick="usePrompt(this)">Which district needs most road investment?</div>
+          <div class="pchip" onclick="usePrompt(this)">Predict flood zones this rainy season</div>
+          <div class="pchip" onclick="usePrompt(this)">Which agency responds slowest?</div>
+          <div class="pchip" onclick="usePrompt(this)">Top crime risk areas this month</div>
+          <div class="pchip" onclick="usePrompt(this)">How to improve road safety in Freetown?</div>
+        </div>
+        <div class="chat-hist" id="chatHistory">
+          <div class="cmsg a">Hello. I am the CivicLink AI Analyst. I have deep knowledge of Sierra Leone's governance, infrastructure, districts, agencies, and civic patterns. Ask me anything — I give actionable intelligence for government and citizens.</div>
+        </div>
+        <div class="chat-row">
+          <input class="chat-inp" id="chatInput" type="text" placeholder="Ask the AI analyst..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" id="chatSend" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFLINE MODE SCREEN -->
+  <div class="screen" id="screen-offline">
+    <div class="offline-screen">
+      <div class="offline-hero">
+        <div class="offline-icon">📶</div>
+        <div class="offline-h">Offline Mode Active</div>
+        <div class="offline-sub">Reports saved locally · Will sync when connected</div>
+      </div>
+      <div class="sec-h"><div class="dot"></div>Queued Reports (3 pending sync)</div>
+      <div class="offline-queue">
+        <div class="oq-item"><div class="oq-icon">🛣️</div><div class="oq-title">Road damage — Congo Cross junction</div><div class="oq-status">⏳ Queued</div></div>
+        <div class="oq-item"><div class="oq-icon">💧</div><div class="oq-title">Water pipe burst — Hill Station Road</div><div class="oq-status">⏳ Queued</div></div>
+        <div class="oq-item"><div class="oq-icon">⚡</div><div class="oq-title">Power outage — Lumley Beach area</div><div class="oq-status">⏳ Queued</div></div>
+      </div>
+      <button class="sync-btn" onclick="showToast('✅ 3 reports synced to server!')">📡 Sync Now (WiFi Detected)</button>
+      <div class="sec-h" style="margin-top:14px;"><div class="dot"></div>Available Offline</div>
+      <div class="card">
+        <div class="oq-item"><div class="oq-icon" style="background:var(--green-tint);">📝</div><div><div class="oq-title">Submit new reports</div><div style="font-size:10px;color:var(--muted);">Saved locally until connected</div></div><span class="pill pill-green">✓ Available</span></div>
+        <div class="oq-item"><div class="oq-icon" style="background:var(--green-tint);">📋</div><div><div class="oq-title">View your past reports</div><div style="font-size:10px;color:var(--muted);">Cached from last sync</div></div><span class="pill pill-green">✓ Available</span></div>
+        <div class="oq-item"><div class="oq-icon" style="background:var(--green-tint);">🔔</div><div><div class="oq-title">Emergency alerts</div><div style="font-size:10px;color:var(--muted);">Last broadcast cached</div></div><span class="pill pill-green">✓ Available</span></div>
+        <div class="oq-item" style="border:none;"><div class="oq-icon" style="background:var(--red-tint);">🗺️</div><div><div class="oq-title">Live map</div><div style="font-size:10px;color:var(--muted);">Requires connection</div></div><span class="pill pill-red">Offline</span></div>
+      </div>
+      <div style="background:var(--gold-tint);border-radius:var(--r2);padding:12px;border:1.5px solid #F6D860;">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px;">📱 No data at all?</div>
+        <div style="font-size:11px;color:var(--ink);line-height:1.5;">Use SMS: <b>text REPORT to 717</b><br>Use USSD: <b>dial *717#</b><br>Works on any phone · Any network · No data needed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="screen" id="screen-profile">
+    <div class="pad">
+      <div class="profile-hero">
+        <div class="ph-av" id="profile-av">AK</div>
+        <div class="ph-name" id="profile-name">Aminata Koroma</div>
+        <div class="ph-loc">📍 East Freetown, Western Area</div>
+        <div class="ph-chips"><span class="phchip">🏅 Active Citizen</span><span class="phchip">🔒 Verified</span><span class="phchip">🇸🇱 Sierra Leone</span></div>
+      </div>
+      <div class="impact-g">
+        <div class="ic"><div class="ic-n">12</div><div class="ic-l">Reports Filed</div></div>
+        <div class="ic"><div class="ic-n">8</div><div class="ic-l">Resolved</div></div>
+        <div class="ic"><div class="ic-n">34</div><div class="ic-l">People Helped</div></div>
+      </div>
+      <div class="menu-list">
+        <div class="mi" onclick="switchScreen('tracker')"><div class="mi-icon">📋</div>My Reports (12)<div class="mi-arr">›</div></div>
+        <div class="mi" onclick="showLang()"><div class="mi-icon">🌍</div>Language<div class="mi-badge" id="lang-badge">English</div></div>
+        <div class="mi" onclick="openDistrict()"><div class="mi-icon">📍</div>My District<div class="mi-badge">Western Area</div></div>
+        <div class="mi" onclick="switchScreen('offline')"><div class="mi-icon">📶</div>Offline Mode<div class="mi-arr">›</div></div>
+        <div class="mi" onclick="switchScreen('ussd')"><div class="mi-icon">📱</div>SMS / USSD Guide<div class="mi-arr">›</div></div>
+        <div class="mi" onclick="switchMode('wangov')"><div class="mi-icon">🏛️</div>WanGov Services<div class="mi-arr">›</div></div>
+        <div class="mi" onclick="switchScreen('alerts')"><div class="mi-icon">🔔</div>Emergency Alerts<div class="mi-arr">›</div></div>
+        <div class="mi" onclick="switchMode('transparency')"><div class="mi-icon">📊</div>Public Dashboard<div class="mi-arr">›</div></div>
+        <div class="mi" onclick="switchMode('landing')"><div class="mi-icon">ℹ️</div>About CivicLink<div class="mi-arr">›</div></div>
+      </div>
+      <div style="background:var(--green-tint);border:1.5px solid #A7F3C6;border-radius:var(--r2);padding:14px;text-align:center;margin-top:12px;">
+        <div style="font-size:24px;margin-bottom:5px;">🏅</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--green);">Active Citizen Award</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">8 issues resolved through your reports. Sierra Leone thanks you.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LANDING / INVESTOR PAGE -->
+  <div class="screen" id="screen-landing">
+    <div class="landing">
+      <div class="lp-hero">
+        <div class="lp-kicker">Sierra Leone · Africa's First Citizen Intelligence Platform</div>
+        <div class="lp-h">The Digital Nervous<br>System of <em>Governance</em></div>
+        <div class="lp-sub">CivicLink transforms every mobile phone into a governance tool and every citizen into a trusted partner of the state — connecting communities to government in real time.</div>
+        <div class="lp-btns">
+          <button class="lp-btn-g" onclick="finishOnboard()">Try the App</button>
+          <button class="lp-btn-o" onclick="showToast('📧 Pitch deck sent to your email')">Request Pitch Deck</button>
+        </div>
+        <div class="lp-stats">
+          <div class="lp-stat"><div class="lp-stat-num">8.1M</div><div class="lp-stat-lbl">Sierra Leoneans</div></div>
+          <div class="lp-stat"><div class="lp-stat-num">16</div><div class="lp-stat-lbl">Districts Covered</div></div>
+          <div class="lp-stat"><div class="lp-stat-num">20+</div><div class="lp-stat-lbl">Gov Agencies</div></div>
+        </div>
+      </div>
+      <div class="lp-features">
+        <div class="lp-features-h">What CivicLink Does</div>
+        <div class="feat-card"><div class="feat-icon" style="background:var(--green-tint);">📱</div><div><div class="feat-title">Works on Any Phone</div><div class="feat-desc">Smartphone app, SMS reporting, and USSD (*717#) so every Sierra Leonean can participate — no data required.</div></div></div>
+        <div class="feat-card"><div class="feat-icon" style="background:var(--purple-tint);">🤖</div><div><div class="feat-title">AI Intelligence Engine</div><div class="feat-desc">Predicts floods, crime patterns, road failures, and infrastructure risks before they become crises — giving government intelligence, not just complaints.</div></div></div>
+        <div class="feat-card"><div class="feat-icon" style="background:var(--wangov-tint);">🏛️</div><div><div class="feat-title">WanGov Salone Integration</div><div class="feat-desc">Fully integrated with Government of Sierra Leone's digital portal — reports auto-route to the right ministry, agency, and officer.</div></div></div>
+        <div class="feat-card"><div class="feat-icon" style="background:var(--blue-tint);">📊</div><div><div class="feat-title">Full Accountability</div><div class="feat-desc">Every report tracked from citizen to resolution. Public scorecards. Agency rankings. Open data API. Citizens rate government responses.</div></div></div>
+        <div class="feat-card"><div class="feat-icon" style="background:var(--gold-tint);">🌍</div><div><div class="feat-title">Offline &amp; Low-Bandwidth</div><div class="feat-desc">Reports saved offline and sync when connected. Available in English, Krio, Mende, and Temne. Built for African network realities.</div></div></div>
+      </div>
+      <div class="roadmap" style="padding:0 20px 20px;">
+        <div class="rm-h">Implementation Roadmap</div>
+        <div class="rm-step"><div class="rm-num" style="background:var(--green-tint);color:var(--green);">1</div><div><div class="rm-title">Phase 1 — Freetown Pilot (Months 1–3)</div><div class="rm-desc">Launch in Western Area with 5 agencies. Target: 500 reports, 80% resolution rate, government MOU signed.</div></div></div>
+        <div class="rm-step"><div class="rm-num" style="background:var(--gold-tint);color:var(--gold);">2</div><div><div class="rm-title">Phase 2 — National Rollout (Months 4–12)</div><div class="rm-desc">All 16 districts, 20+ agencies, full WanGov integration, SMS/USSD live. Target: 50,000 active citizens.</div></div></div>
+        <div class="rm-step"><div class="rm-num" style="background:var(--blue-tint);color:var(--blue);">3</div><div><div class="rm-title">Phase 3 — ECOWAS Expansion (Year 2+)</div><div class="rm-desc">Liberia, Guinea, Gambia. Africa's first multi-country citizen intelligence network.</div></div></div>
+      </div>
+      <div class="lp-partners">
+        <div class="lp-partners-h">BUILT FOR INTEGRATION WITH</div>
+        <div class="partner-row">
+          <div class="partner-pill">🏛️ WanGov Salone</div>
+          <div class="partner-pill">📋 NRA Sierra Leone</div>
+          <div class="partner-pill">🪪 NASSIT</div>
+          <div class="partner-pill">⚡ EDSA</div>
+          <div class="partner-pill">🌿 EPA SL</div>
+          <div class="partner-pill">🏙️ Freetown City Council</div>
+          <div class="partner-pill">🚨 Sierra Leone Police</div>
+          <div class="partner-pill">📡 Africell SL</div>
+        </div>
+      </div>
+      <div class="lp-cta">
+        <div class="lp-cta-h">Ready to partner?</div>
+        <div class="lp-cta-sub">Government bodies, development partners, and investors — let's build this together.</div>
+        <button class="lp-btn-g" onclick="showToast('📧 Contact request sent')">Get in Touch</button>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<nav class="bnav" id="mainNav" style="display:none;">
+  <button class="nb active" id="nav-home" onclick="switchScreen('home')"><div class="nb-icon">🏠</div>Home</button>
+  <button class="nb" id="nav-feed" onclick="switchScreen('feed')"><div class="nb-icon">🗺️</div>Live Map</button>
+  <button class="nb nb-report" id="nav-report" onclick="switchScreen('report')"><div class="nb-icon">➕</div>Report</button>
+  <button class="nb" id="nav-tracker" onclick="switchScreen('tracker')"><div class="nb-icon">📊</div>My Reports</button>
+  <button class="nb" id="nav-profile" onclick="switchScreen('profile')"><div class="nb-icon">👤</div>Profile</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+</div><!-- /app -->
+
+<script>
+// ━━━ STATE ━━━
+let obSlide = 0; const OB_TOTAL = 5;
+let currentLang = 'en';
+let currentDistrict = 'Western Area, Freetown';
+let chatMsgs = [{role:'assistant',content:"Hello. I am the CivicLink AI Analyst. I have deep knowledge of Sierra Leone's governance, infrastructure, districts, agencies, and civic patterns. Ask me anything — I give actionable intelligence for government and citizens."}];
+let currentAiTab = 'ai-predict';
+
+// ━━━ TRANSLATIONS ━━━
+const T = {
+  en:{ hero:"Your eyes become\ngovernment intelligence.", reportIssue:"Report an Issue", reportH:"Report an Issue", reportSub:"Sent directly to the responsible ministry, agency & local council." },
+  kr:{ hero:"Yu eyes na di\ngovernment intelligence.", reportIssue:"Report Wahala", reportH:"Report Wahala", reportSub:"E go go straight to di right ministry, agency en local council." }
+};
+
+// ━━━ DISTRICTS ━━━
+const DISTRICTS = [
+  {name:"Western Area Urban",region:"Freetown",count:"544 reports"},
+  {name:"Western Area Rural",region:"Western Province",count:"89 reports"},
+  {name:"Bo District",region:"Southern Province",count:"251 reports"},
+  {name:"Kenema District",region:"Eastern Province",count:"172 reports"},
+  {name:"Kailahun District",region:"Eastern Province",count:"92 reports"},
+  {name:"Kono District",region:"Eastern Province",count:"68 reports"},
+  {name:"Bombali District",region:"Northern Province",count:"136 reports"},
+  {name:"Tonkolili District",region:"Northern Province",count:"74 reports"},
+  {name:"Koinadugu District",region:"Northern Province",count:"41 reports"},
+  {name:"Falaba District",region:"Northern Province",count:"28 reports"},
+  {name:"Kambia District",region:"Northern Province",count:"55 reports"},
+  {name:"Port Loko District",region:"North West Province",count:"98 reports"},
+  {name:"Moyamba District",region:"Southern Province",count:"63 reports"},
+  {name:"Bo District South",region:"Southern Province",count:"47 reports"},
+  {name:"Pujehun District",region:"Southern Province",count:"39 reports"},
+  {name:"Bonthe District",region:"Southern Province",count:"22 reports"},
+];
+
+// ━━━ ROUTING MAP ━━━
+const ROUTES = {
+  road:['Ministry of Works, Housing & Infrastructure','Freetown City Council — Roads Unit','District Officer, Western Area'],
+  electricity:['Ministry of Energy & Power','EDSA — Electricity Distribution & Supply','District Engineer, Western Area'],
+  flood:['Ministry of Water Resources','FCC — Drainage Unit','National Disaster Management Agency'],
+  building:['Ministry of Lands, Housing & Country Planning','Urban Planning Authority','Building Inspectorate Unit'],
+  fire:['Sierra Leone Fire Force','National Disaster Management Agency','Ministry of Internal Affairs'],
+  environment:['EPA Sierra Leone','Forestry Division','Ministry of Environment & Climate Change'],
+  health:['Ministry of Health & Sanitation','District Health Management Team','National Emergency Medical Services'],
+  security:['Sierra Leone Police Force','Ministry of Internal Affairs','District Security Coordinator'],
+  water:['Guma Valley Water Company','Ministry of Water Resources','District Water Officer'],
+  corruption:['Anti-Corruption Commission (ACC)','Inspector General Office','Ministry of Finance — Audit Unit'],
+};
+
+// ━━━ ONBOARDING ━━━
+function obNext() {
+  if (obSlide < OB_TOTAL - 1) {
+    document.getElementById('ob'+obSlide).classList.remove('active');
+    obSlide++;
+    document.getElementById('ob'+obSlide).classList.add('active');
+    document.querySelectorAll('.ob-dot').forEach((d,i)=>d.classList.toggle('active',i===obSlide));
+    document.getElementById('ob-next-btn').textContent = obSlide === OB_TOTAL-1 ? 'Enter CivicLink →' : 'Continue →';
+    if (obSlide === OB_TOTAL-1) document.getElementById('ob-next-btn').onclick = finishOnboard;
+  } else { finishOnboard(); }
+}
+function finishOnboard() {
+  document.getElementById('onboard').classList.add('hidden');
+  document.getElementById('mainHeader').style.display = '';
+  document.getElementById('liveBar').style.display = '';
+  document.getElementById('ussdBar').style.display = '';
+  document.getElementById('mainContent').style.display = '';
+  document.getElementById('mainNav').style.display = '';
+  buildDistricts();
+}
+function selectLang(code, el) {
+  currentLang = code;
+  document.querySelectorAll('#ob4 .lang-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ━━━ LANGUAGE OVERLAY ━━━
+function showLang() { document.getElementById('langOverlay').classList.add('show'); }
+function closeLang() { document.getElementById('langOverlay').classList.remove('show'); }
+function selectLangOverlay(code, el) {
+  currentLang = code;
+  document.querySelectorAll('.lang-overlay .lang-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('lang-badge').textContent = el.querySelector('.lang-opt-name').textContent;
+  applyLang();
+  closeLang();
+  showToast('🌍 Language updated');
+}
+function applyLang() {
+  const t = T[currentLang] || T.en;
+  const hh = document.getElementById('hero-h');
+  if(hh) hh.innerHTML = t.hero.replace('\n','<br>').replace('government intelligence.','<em>government intelligence.</em>');
+  const ri = document.getElementById('report-issue-label');
+  if(ri) ri.textContent = t.reportIssue;
+  const rh = document.getElementById('report-h');
+  if(rh) rh.textContent = t.reportH;
+  const rs = document.getElementById('report-sub');
+  if(rs) rs.textContent = t.reportSub;
+}
+
+// ━━━ DISTRICT SELECTOR ━━━
+function buildDistricts() {
+  const g = document.getElementById('districtGrid');
+  if(!g || g.children.length > 0) return;
+  DISTRICTS.forEach(d => {
+    const b = document.createElement('div');
+    b.className = 'dist-btn' + (d.name.includes('Western Area Urban') ? ' sel' : '');
+    b.innerHTML = `<div class="dist-name">${d.name}</div><div class="dist-region">${d.region}</div><div class="dist-count">${d.count}</div>`;
+    b.onclick = () => {
+      document.querySelectorAll('.dist-btn').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');
+      currentDistrict = d.name;
+      document.getElementById('current-district').textContent = d.name + ', ' + d.region;
+      closeDistrict();
+      showToast('📍 District updated: ' + d.name);
+    };
+    g.appendChild(b);
+  });
+}
+function openDistrict() { document.getElementById('districtOverlay').classList.add('show'); }
+function closeDistrict() { document.getElementById('districtOverlay').classList.remove('show'); }
+
+// ━━━ NAVIGATION ━━━
+const CITIZEN_SCREENS = ['home','report','tracker','feed','alerts','profile','ussd','offline'];
+const GOV_SCREENS = ['gov'];
+const AI_SCREENS = ['ai'];
+const TRANS_SCREENS = ['transparency'];
+const WANGOV_SCREENS = ['wangov'];
+const LANDING_SCREENS = ['landing'];
+
+function switchScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const el = document.getElementById('screen-'+name);
+  if(el) el.classList.add('active');
+  const nb = document.getElementById('nav-'+name);
+  if(nb) nb.classList.add('active');
+  document.querySelector('.content').scrollTop = 0;
+}
+
+function switchMode(mode) {
+  const modeMap = {citizen:'home',gov:'gov',ai:'ai',transparency:'transparency',wangov:'wangov',landing:'landing'};
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.mtab');
+  const modeIdx = {citizen:0,gov:1,ai:2,transparency:3,wangov:4,landing:5};
+  if(tabs[modeIdx[mode]]) tabs[modeIdx[mode]].classList.add('active');
+  switchScreen(modeMap[mode]);
+}
+
+// ━━━ REPORT FORM ━━━
+function pickCat(btn,type) {
+  document.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const depts = ROUTES[type] || [];
+  document.getElementById('routeItems').innerHTML = depts.map(d=>`<div class="route-item"><div class="ri-dot"></div>${d}</div>`).join('');
+}
+function pickSev(btn) { document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('s')); btn.classList.add('s'); }
+function submitReport() {
+  showToast('✅ Report #SC-2025-'+Math.floor(Math.random()*9000+1000)+' submitted');
+  setTimeout(()=>switchScreen('tracker'),1200);
+}
+
+// ━━━ GOV PORTAL ━━━
+function selectMin(btn) { document.querySelectorAll('.min-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); }
+function govLogin() {
+  document.getElementById('gov-login-view').style.display='none';
+  document.getElementById('gov-dash-view').style.display='block';
+  showToast('🏛️ Welcome to Command Dashboard');
+}
+
+// ━━━ AI ENGINE ━━━
+function switchAiTab(el, tabId) {
+  document.querySelectorAll('.aitab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['ai-predict','ai-analyze','ai-forecast','ai-chat'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; });
+  const t = document.getElementById(tabId);
+  if(t) t.style.display='block';
+  currentAiTab = tabId;
+}
+
+const AI_PROMPTS = {
+  predict:{
+    sys:`You are a risk prediction AI for CivicLink Sierra Leone. Analyze conditions and generate a structured risk assessment with: 1) Overall Risk Level (Critical/High/Medium/Low), 2) Top 3-5 specific risk predictions with probability %, 3) Recommended government pre-actions. Ground everything in Sierra Leone's real context — rainy/dry seasons, Freetown's drainage challenges, rural infrastructure gaps. Be concise and actionable.`,
+    user:()=>{
+      const loc=document.getElementById('pred-loc')?.value||'Freetown';
+      const season=document.getElementById('pred-season')?.value||'Rainy season';
+      const ctx=document.getElementById('pred-ctx')?.value||'No additional context';
+      const chips=[...document.querySelectorAll('#predChips .achip.sel')].map(c=>c.textContent.trim()).join(', ');
+      return `Location: ${loc}\nSeason: ${season}\nRisk categories: ${chips||'All'}\nContext: ${ctx}\n\nGenerate risk prediction.`;
+    }
+  },
+  analyze:{
+    sys:`You are CivicLink's incident intelligence analyzer for Sierra Leone. For any incident: 1) Priority Score 0-100 (Severity × Urgency × Population Impact × Risk to Life), 2) Classify Critical/High/Medium/Low, 3) Exact SL agencies to route to (EDSA, FCC, EPA, SLAF, Police, Ministries), 4) Immediate recommended actions, 5) Estimated resolution timeframe. Format clearly with labels.`,
+    user:()=>{
+      const d=document.getElementById('inc-desc')?.value||'Road damage reported';
+      const c=document.getElementById('inc-cat')?.value||'Road';
+      return `Incident: ${d}\nCategory: ${c}\nAnalyze and provide full intelligence assessment.`;
+    }
+  },
+  road:{
+    sys:`You are a road safety AI for Sierra Leone. Analyze road conditions and generate: 1) Safety Rating 1-10, 2) Top risk factors, 3) 7-day accident prediction, 4) Specific danger points on the route, 5) Recommended interventions for Ministry of Works and Sierra Leone Road Safety Authority. Know key SL routes: Kissy Road, Wilberforce, Bo-Kenema Highway, Waterloo Road.`,
+    user:()=>{
+      const r=document.getElementById('road-inp')?.value||'Kissy Road';
+      const c=document.getElementById('road-ctx')?.value||'General assessment requested';
+      return `Road: ${r}\nData: ${c}\nGenerate road safety assessment.`;
+    }
+  },
+  triage:{
+    sys:`You are CivicLink's auto-triage engine. For any citizen report: 1) Priority Score 0-100, 2) Classification CRITICAL/HIGH/MEDIUM/LOW, 3) Exact SL agencies to route to, 4) Response SLA (hours), 5) Duplicate/pattern flag, 6) Public alert needed? Be decisive — this is emergency triage.`,
+    user:()=>{
+      const t=document.getElementById('triage-inp')?.value||'Incident reported';
+      return `Citizen report: "${t}"\nAuto-triage now.`;
+    }
+  },
+  forecast:{
+    sys:`You are CivicLink's 7-day forecast engine for Sierra Leone. Generate a day-by-day forecast: Day 1-7 with predicted incident types, volume estimates, and government pre-positioning recommendations. End with Weekly Summary and Top 3 Pre-emptive Actions. Base on Sierra Leone's seasonal patterns, market day cycles, and infrastructure condition trends.`,
+    user:()=>{
+      const l=document.getElementById('fc-loc')?.value||'Freetown';
+      return `Location: ${l}\nGenerate 7-day civic incident forecast.`;
+    }
+  },
+  crime:{
+    sys:`You are a crime intelligence analyst for CivicLink Sierra Leone. Generate: 1) Crime Risk Level, 2) Pattern Analysis (type, timing, location), 3) 7-day forecast, 4) Specific hotspots, 5) Police deployment strategy, 6) Public safety advisory, 7) Prevention recommendations for district council and SLPF.`,
+    user:()=>{
+      const a=document.getElementById('crime-area')?.value||'Central Freetown';
+      const c=document.getElementById('crime-ctx')?.value||'General assessment';
+      return `Area: ${a}\nKnown patterns: ${c}\nGenerate crime intelligence report.`;
+    }
+  }
+};
+
+async function runAI(type) {
+  const cfg = AI_PROMPTS[type];
+  if(!cfg) return;
+  const box = document.getElementById('box-'+type);
+  const txt = document.getElementById('txt-'+type);
+  const meta = document.getElementById('meta-'+type);
+  const conf = document.getElementById('conf-'+type);
+  const btn = document.getElementById('btn-'+type);
+
+  box.style.display='block';
+  txt.textContent='Analyzing with AI...';
+  txt.className='ai-content loading';
+  if(meta) meta.style.display='none';
+  if(btn){ btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Running AI...'; }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:cfg.sys,messages:[{role:'user',content:cfg.user()}]})
+    });
+    const data = await res.json();
+    const text = data.content?.map(b=>b.text||'').join('')||'No response received.';
+    txt.textContent=text;
+    txt.className='ai-content';
+    if(meta) meta.style.display='flex';
+    if(conf) conf.textContent=`claude-sonnet-4-6 · ${new Date().toLocaleTimeString()}`;
+  } catch(e) {
+    txt.textContent='AI connection error: '+e.message+'. Add your Anthropic API key to activate.';
+    txt.className='ai-content';
+  } finally {
+    if(btn){ btn.disabled=false; btn.innerHTML=btn.getAttribute('data-orig')||'Run'; }
+  }
+}
+
+// Store original button labels
+document.querySelectorAll('[id^="btn-"]').forEach(b=>b.setAttribute('data-orig',b.innerHTML));
+
+// ━━━ AI CHAT ━━━
+function usePrompt(el) { document.getElementById('chatInput').value=el.textContent; document.getElementById('chatInput').focus(); }
+async function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim();
+  if(!msg) return;
+  inp.value='';
+  const sendBtn = document.getElementById('chatSend');
+  sendBtn.disabled=true;
+  chatMsgs.push({role:'user',content:msg});
+  renderChat();
+  const lid='load-'+Date.now();
+  appendMsg('a','Thinking...', lid, true);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':'sk-ant-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','anthropic-version':'2023-06-01'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',max_tokens:800,
+        system:`You are the CivicLink AI Governance Analyst for Sierra Leone. Deep knowledge of: Sierra Leone geography, districts, government structure (ministries, local councils, EDSA, EPA, FCC, NASSIT, NRA, SLPF), infrastructure challenges, civic incident patterns, rainy/dry seasons, flooding zones, agency performance, road safety, crime patterns in urban SL. Give concise, actionable, data-informed answers under 200 words. Speak as a trusted government adviser.`,
+        messages:chatMsgs.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(b=>b.text||'').join('')||'No response.';
+    document.getElementById(lid)?.remove();
+    chatMsgs.push({role:'assistant',content:text});
+    appendMsg('a',text);
+  } catch(e) {
+    document.getElementById(lid)?.remove();
+    appendMsg('a','Connection error. Add your Anthropic API key to activate AI features.');
+  } finally { sendBtn.disabled=false; }
+}
+function renderChat() {
+  const h=document.getElementById('chatHistory');
+  h.innerHTML='';
+  chatMsgs.forEach(m=>appendMsg(m.role==='assistant'?'a':'u',m.content));
+}
+function appendMsg(role,text,id,loading) {
+  const h=document.getElementById('chatHistory');
+  const d=document.createElement('div');
+  d.className=`cmsg ${role}${loading?' loading':''}`;
+  if(id) d.id=id;
+  d.textContent=text;
+  h.appendChild(d);
+  h.scrollTop=h.scrollHeight;
+}
+
+// ━━━ USSD SIMULATOR ━━━
+const USSD_FLOWS = {
+  '1':`CivicLink — Report Issue\n\n1. Road Damage\n2. Flooding / Drainage\n3. Electricity / Power\n4. Fire Hazard\n5. Security Incident\n0. Back\n\nEnter number:`,
+  '2':`CivicLink — Report Status\n\nEnter your report ID\n(e.g. 0482 for #SC-2025-0482)\n\nEnter ID:`,
+  '3':`ACTIVE ALERTS:\n\n⚠️ FLOOD WARNING\nEast Freetown\nMove to higher ground\n\n🔶 ROAD CLOSED\nKissy Road — Bridge damage\n\nReply 0 to exit`,
+  '4':`WanGov Services:\n\n1. NRA — Tax Services\n2. NASSIT — Pensions\n3. Land Registration\n4. Health Services\n0. Back\n\nEnter number:`,
+  '0':`Thank you for using\nCivicLink Sierra Leone\n\nDial *717# anytime\nor SMS REPORT to 717\n\nGovernance for everyone.`
+};
+function ussdKey(k) {
+  const scr = document.getElementById('ussd-screen');
+  const flow = USSD_FLOWS[k];
+  if(flow) {
+    scr.innerHTML = flow + '\n\n<span style="color:#5CDB5C;">Enter: <span class="ussd-cursor">_</span></span>';
+  } else {
+    showToast('📟 Processing: ' + k);
+  }
+}
+function ussdSend() { ussdKey('1'); }
+function ussdReset() {
+  document.getElementById('ussd-screen').innerHTML = `<span style="color:#8BC34A;">CivicLink Sierra Leone</span>\n<span style="color:#666;">*717#</span>\n\n<span style="color:#FFF;">Welcome to CivicLink</span>\n<span>Report issues to Government</span>\n\n1. Report an Issue\n2. Check Report Status\n3. Emergency Alerts\n4. WanGov Services\n0. Exit\n\n<span style="color:#5CDB5C;">Enter: <span class="ussd-cursor">_</span></span>`;
+}
+
+// ━━━ WANGOV ━━━
+function openWanGov(url) {
+  showToast('🏛️ Opening WanGov service...');
+  setTimeout(()=>window.open(url,'_blank'),800);
+}
+
+// ━━━ EXPORT AI ━━━
+function exportAI(type) {
+  const txt = document.getElementById('txt-'+type)?.textContent||'No content';
+  const blob = new Blob([`CivicLink AI Report — ${type.toUpperCase()}\nGenerated: ${new Date().toLocaleString()}\nSierra Leone Citizen Intelligence Network\n\n${txt}`],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`civiclink-${type}-${Date.now()}.txt`;
+  a.click();
+  showToast('✅ Report exported');
+}
+
+// ━━━ FEED TABS ━━━
+document.querySelectorAll('.ftab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.ftab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+  });
+});
+
+// ━━━ TOAST ━━━
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ━━━ OFFLINE DETECTION ━━━
+window.addEventListener('offline',()=>document.getElementById('offlineBanner').classList.add('show'));
+window.addEventListener('online',()=>{ document.getElementById('offlineBanner').classList.remove('show'); showToast('✅ Back online — syncing reports...'); });
+</script>
+</body>
+</html>
